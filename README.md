@@ -1,84 +1,85 @@
-# heritage-types — Canonical Heritage Science Data Models
+# heritage-types
 
-**Single source of truth** for shared data types across the HOARD ecosystem (HOARD, StratiGraph, Trowel, Libby, Dibble, Cache & Carry, DIG, and others).
+**Canonical data models for the HOARD heritage science ecosystem.**
 
-## Architecture
+This repository is not a standalone product. It is an infrastructure dependency that provides shared data type definitions used by multiple projects in the ecosystem. End users should never need to interact with this repository directly — the Python package (`heritage-models`) is installed automatically as a dependency of HOARD.
+
+## What This Provides
+
+### Python: `heritage-models`
+
+```bash
+# Installed automatically with HOARD
+pip install hoard
+
+# Or install standalone
+pip install heritage-models
+```
+
+Provides Pydantic v2 models for all core heritage data types:
+- `StratigraphicUnit` — archaeological context sheet data
+- `Find` — artefact records
+- `Sample` — environmental/C14/isotopic sample data
+- `Chronology` — calibrated radiocarbon dates
+- `StratigraphicRelationship` — stratigraphic relationships (cuts, fills, equals)
+- `DigitalAsset` — photographs, drawings, GIS layers
+- `SiteMetadata` — project-level metadata
+- `HeritageDataPackage` — full project container for cross-tool exchange
+
+### Python: `heritage-vocab`
+
+Optional offline vocabulary service for Getty AAT/ULAN/TGN term normalisation. Provides material and period standardisation with a built-in fallback covering common archaeological terms.
+
+```python
+from heritage_vocab import VocabularyService
+
+svc = VocabularyService()
+result = svc.normalise_material("flint")
+# → VocabTerm(id="http://vocab.getty.edu/aat/300011754",
+#             preferred_label="Flint/Chert")
+```
+
+### TypeScript: `@heritage/types`
+
+TypeScript interfaces for web-based tools (StratiGraph, Libby frontend). Published from this repository's `typescript/` directory.
+
+### JSON Schema
+
+Canonical JSON Schema files in `schemas/` — language-agnostic, usable from any programming environment for data validation.
+
+## Source of Truth
+
+All models are defined in TypeSpec (`spec/main.tsp`) and compiled to JSON Schema Draft 2020-12. Python and TypeScript packages are auto-generated from the compiled schemas.
 
 ```
-spec/main.tsp  (TypeSpec — source of truth)
+spec/main.tsp  (TypeSpec)
        │
-       │  tsp compile --emit @typespec/json-schema
        ▼
-schemas/heritage-data-package-v1.json  (JSON Schema Draft 2020-12)
+schemas/*.json  (JSON Schema)
        │
-       ├── datamodel-code-generator ──► python/heritage_models/  (Pydantic v2)
-       └── custom script          ──► typescript/src/index.ts  (TypeScript interfaces)
+       ├──► python/heritage_models/  (Pydantic v2, auto-generated)
+       ├──► python/heritage_vocab/   (vocabulary service)
+       └──► typescript/              (TypeScript interfaces)
 ```
-
-## Usage
-
-### Python (heritage-models)
-
-```bash
-pip install ./python/heritage_models
-
-# In your code:
-from heritage_models import StratigraphicUnit, Find, HeritageDataPackage
-
-su = StratigraphicUnit(
-    id="123e4567-e89b-12d3-a456-426614174000",
-    contextNumber="[101]",
-    unitType="Deposit",
-)
-```
-
-### TypeScript (@heritage/types)
-
-```typescript
-import { StratigraphicUnit, HeritageDataPackage } from '@heritage/types';
-
-const su: StratigraphicUnit = {
-    id: "123e4567-e89b-12d3-a456-426614174000",
-    contextNumber: "[101]",
-    unitType: "Deposit",
-};
-```
-
-### Direct JSON Schema (any language)
-
-```bash
-# Reference the schema directly for validation
-assert_against_schema(heritage-data-package-v1.json, my_data)
-```
-
-## Models
-
-| Model | Description | Used By |
-|-------|-------------|---------|
-| `SiteMetadata` | Project-level metadata | All projects |
-| `StratigraphicUnit` | Archaeological context / stratigraphic unit | HOARD, StratiGraph, Trowel |
-| `StratigraphicRelationship` | Stratigraphic relationship (cuts, fills, equals) | HOARD, StratiGraph, Trowel |
-| `Find` | Artefact recovered during excavation | HOARD, Trowel, Dibble |
-| `Sample` | Scientific sample (C14, environmental, isotopic) | HOARD, Libby, IsoMap |
-| `Chronology` | Calibrated radiocarbon / luminescence date | Libby, HOARD, Fritts |
-| `DigitalAsset` | Photo, drawing, GIS layer | HOARD, Trowel, DIG |
-| `HeritageDataPackage` | Full project data container for exchange | All projects |
 
 ## Development
 
 ```bash
-# Build everything
-make all
-
-# Or individual steps
-make compile   # TypeSpec → JSON Schema
-make python    # JSON Schema → Pydantic v2
-make typescript  # JSON Schema → TypeScript
-
-# Edit the source models
-vim spec/main.tsp
-make all
+make all        # Full build: compile → python → typescript
+make compile    # TypeSpec → JSON Schema only
+make python     # Regenerate Python models
+make typescript # Regenerate TypeScript types
 ```
+
+## Repository Architecture
+
+This is one of three infrastructure repositories that support the HOARD ecosystem:
+
+| Repository | Purpose | User-facing |
+|------------|---------|-------------|
+| **HOARD** | Main archaeological report pipeline | Yes — `pip install hoard` |
+| **heritage-types** | Shared data models (this repo) | No — pulled in as dependency |
+| **heritage-cli** | Unified ecosystem CLI | Optional — `pip install heritage-cli` |
 
 ## License
 
