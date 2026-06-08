@@ -1,0 +1,18 @@
+{
+  "name": "heritage-types",
+  "version": "1.0.0",
+  "description": "Canonical heritage science data models — TypeSpec source, JSON Schema output, auto-generated Python and TypeScript packages",
+  "type": "module",
+  "scripts": {
+    "compile": "tsp compile . --emit @typespec/json-schema",
+    "generate:python": "python scripts/generate_python.py",
+    "generate:typescript": "python scripts/generate_typescript.py",
+    "build": "npm run compile && npm run generate:python && npm run generate:typescript",
+    "clean": "rm -rf schemas/*.json dist/"
+  },
+  "devDependencies": {
+    "@typespec/compiler": "latest",
+    "@typespec/json-schema": "latest"
+  },
+  "private": true
+}

@@ -1,0 +1,7 @@
+node_modules/
+__pycache__/
+*.pyc
+dist/
+tsp-output/
+.DS_Store
+python/heritage_models/*.egg-info

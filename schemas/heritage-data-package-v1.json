@@ -1,0 +1,489 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "HeritageDataPackage",
+    "$defs": {
+        "SiteMetadata": {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "$id": "SiteMetadata.json",
+            "type": "object",
+            "properties": {
+                "projectId": {
+                    "$ref": "#/$defs/uuid"
+                },
+                "projectName": {
+                    "type": "string"
+                },
+                "jurisdiction": {
+                    "type": "string"
+                },
+                "gridReference": {
+                    "type": "string"
+                },
+                "epsgCode": {
+                    "type": "integer",
+                    "minimum": -2147483648,
+                    "maximum": 2147483647
+                },
+                "director": {
+                    "type": "string"
+                },
+                "siteCode": {
+                    "type": "string"
+                },
+                "excavationYear": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "$ref": "#/$defs/datetime"
+                },
+                "updatedAt": {
+                    "$ref": "#/$defs/datetime"
+                }
+            },
+            "required": [
+                "projectId",
+                "projectName"
+            ],
+            "$defs": {
+                "uuid": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+                    "format": "uuid"
+                },
+                "datetime": {
+                    "type": "string",
+                    "format": "date-time"
+                }
+            }
+        },
+        "StratigraphicUnit": {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "$id": "StratigraphicUnit.json",
+            "type": "object",
+            "properties": {
+                "id": {
+                    "$ref": "#/$defs/uuid"
+                },
+                "contextNumber": {
+                    "$ref": "#/$defs/fieldId"
+                },
+                "unitType": {
+                    "$ref": "#/$defs/UnitType"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "interpretation": {
+                    "type": "string"
+                },
+                "period": {
+                    "type": "string"
+                },
+                "phase": {
+                    "type": "string"
+                },
+                "length_m": {
+                    "type": "number"
+                },
+                "width_m": {
+                    "type": "number"
+                },
+                "depth_m": {
+                    "type": "number"
+                },
+                "mediaPresent": {
+                    "type": "boolean"
+                },
+                "confidence": {
+                    "type": "number"
+                },
+                "findIds": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/uuid"
+                    }
+                },
+                "sampleIds": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/uuid"
+                    }
+                }
+            },
+            "required": [
+                "id",
+                "contextNumber",
+                "unitType"
+            ],
+            "$defs": {
+                "uuid": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+                    "format": "uuid"
+                },
+                "fieldId": {
+                    "type": "string",
+                    "pattern": "^\\[?[A-Za-z0-9]+\\]?$"
+                },
+                "UnitType": {
+                    "type": "string",
+                    "enum": [
+                        "Deposit",
+                        "Cut",
+                        "Interface",
+                        "Masonry",
+                        "Natural",
+                        "Unknown"
+                    ]
+                }
+            }
+        },
+        "StratigraphicRelationship": {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "$id": "StratigraphicRelationship.json",
+            "type": "object",
+            "properties": {
+                "id": {
+                    "$ref": "#/$defs/uuid"
+                },
+                "sourceId": {
+                    "$ref": "#/$defs/uuid"
+                },
+                "targetId": {
+                    "$ref": "#/$defs/uuid"
+                },
+                "relationshipType": {
+                    "$ref": "#/$defs/RelationshipType"
+                },
+                "confidence": {
+                    "type": "number"
+                },
+                "notes": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id",
+                "sourceId",
+                "targetId",
+                "relationshipType"
+            ],
+            "$defs": {
+                "uuid": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+                    "format": "uuid"
+                },
+                "RelationshipType": {
+                    "type": "string",
+                    "enum": [
+                        "Above",
+                        "Below",
+                        "Equals",
+                        "Contemporary",
+                        "Cuts",
+                        "Fills"
+                    ]
+                }
+            }
+        },
+        "Find": {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "$id": "Find.json",
+            "type": "object",
+            "properties": {
+                "id": {
+                    "$ref": "#/$defs/uuid"
+                },
+                "contextId": {
+                    "$ref": "#/$defs/uuid"
+                },
+                "findNumber": {
+                    "type": "string"
+                },
+                "materialClass": {
+                    "$ref": "#/$defs/MaterialClass"
+                },
+                "typology": {
+                    "type": "string"
+                },
+                "count": {
+                    "type": "integer",
+                    "minimum": -2147483648,
+                    "maximum": 2147483647
+                },
+                "weight_g": {
+                    "type": "number"
+                },
+                "period": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "recorded": {
+                    "type": "boolean"
+                }
+            },
+            "required": [
+                "id",
+                "contextId",
+                "materialClass"
+            ],
+            "$defs": {
+                "uuid": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+                    "format": "uuid"
+                },
+                "MaterialClass": {
+                    "type": "string",
+                    "enum": [
+                        "Pottery",
+                        "Bone",
+                        "Flint",
+                        "Metal",
+                        "CBM",
+                        "Glass",
+                        "Shell",
+                        "Slag",
+                        "Wood",
+                        "Textile",
+                        "Leather",
+                        "Environmental",
+                        "Other"
+                    ]
+                }
+            }
+        },
+        "Sample": {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "$id": "Sample.json",
+            "type": "object",
+            "properties": {
+                "id": {
+                    "$ref": "#/$defs/uuid"
+                },
+                "contextId": {
+                    "$ref": "#/$defs/uuid"
+                },
+                "sampleId": {
+                    "type": "string"
+                },
+                "sampleType": {
+                    "$ref": "#/$defs/SampleType"
+                },
+                "volume_l": {
+                    "type": "number"
+                },
+                "weight_g": {
+                    "type": "number"
+                },
+                "notes": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id",
+                "contextId",
+                "sampleType"
+            ],
+            "$defs": {
+                "uuid": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+                    "format": "uuid"
+                },
+                "SampleType": {
+                    "type": "string",
+                    "enum": [
+                        "Radiocarbon",
+                        "Environmental",
+                        "Isotopic",
+                        "Dendrochronology",
+                        "Archaeomagnetic",
+                        "OSL",
+                        "Other"
+                    ]
+                }
+            }
+        },
+        "Chronology": {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "$id": "Chronology.json",
+            "type": "object",
+            "properties": {
+                "id": {
+                    "$ref": "#/$defs/uuid"
+                },
+                "sampleId": {
+                    "$ref": "#/$defs/uuid"
+                },
+                "contextId": {
+                    "$ref": "#/$defs/uuid"
+                },
+                "labCode": {
+                    "type": "string"
+                },
+                "uncalBp": {
+                    "type": "integer",
+                    "minimum": -2147483648,
+                    "maximum": 2147483647
+                },
+                "error": {
+                    "type": "integer",
+                    "minimum": -2147483648,
+                    "maximum": 2147483647
+                },
+                "calibrationCurve": {
+                    "type": "string"
+                },
+                "calibratedRange68": {
+                    "type": "string"
+                },
+                "calibratedRange95": {
+                    "type": "string"
+                },
+                "datingMethod": {
+                    "type": "string"
+                },
+                "datedMaterial": {
+                    "type": "string"
+                },
+                "delta13C": {
+                    "type": "number"
+                }
+            },
+            "required": [
+                "id"
+            ],
+            "$defs": {
+                "uuid": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+                    "format": "uuid"
+                }
+            }
+        },
+        "DigitalAsset": {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "$id": "DigitalAsset.json",
+            "type": "object",
+            "properties": {
+                "id": {
+                    "$ref": "#/$defs/uuid"
+                },
+                "contextId": {
+                    "$ref": "#/$defs/uuid"
+                },
+                "filePath": {
+                    "type": "string"
+                },
+                "assetType": {
+                    "type": "string"
+                },
+                "mimeType": {
+                    "type": "string"
+                },
+                "fileSizeBytes": {
+                    "type": "string"
+                },
+                "checksumSha256": {
+                    "type": "string"
+                },
+                "caption": {
+                    "type": "string"
+                },
+                "orientation": {
+                    "type": "string"
+                },
+                "scale": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id",
+                "filePath",
+                "assetType"
+            ],
+            "$defs": {
+                "uuid": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+                    "format": "uuid"
+                }
+            }
+        },
+        "HeritageDataPackage": {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "$id": "HeritageDataPackage.json",
+            "type": "object",
+            "properties": {
+                "schemaVersion": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "$ref": "#/$defs/datetime"
+                },
+                "provenance": {
+                    "type": "string"
+                },
+                "metadata": {
+                    "$ref": "SiteMetadata.json"
+                },
+                "contexts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "StratigraphicUnit.json"
+                    }
+                },
+                "relationships": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "StratigraphicRelationship.json"
+                    }
+                },
+                "finds": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "Find.json"
+                    }
+                },
+                "samples": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "Sample.json"
+                    }
+                },
+                "dates": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "Chronology.json"
+                    }
+                },
+                "assets": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "DigitalAsset.json"
+                    }
+                }
+            },
+            "required": [
+                "schemaVersion",
+                "createdAt",
+                "contexts",
+                "relationships",
+                "finds",
+                "samples",
+                "dates",
+                "assets"
+            ],
+            "$defs": {
+                "datetime": {
+                    "type": "string",
+                    "format": "date-time"
+                }
+            }
+        }
+    }
+}
