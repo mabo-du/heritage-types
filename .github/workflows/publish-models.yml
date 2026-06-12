@@ -1,0 +1,57 @@
+name: Publish heritage-models to PyPI
+
+on:
+  push:
+    tags:
+      - "models-v*.*.*"
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install TypeSpec dependencies
+        run: npm ci
+
+      - name: Compile TypeSpec → JSON Schema
+        run: |
+          npx tsp compile . \
+            --emit @typespec/json-schema \
+            --option "@typespec/json-schema.file-type=json" \
+            --option "@typespec/json-schema.bundleId=HeritageDataPackage"
+
+      - name: Rename schema output
+        run: mv schemas/HeritageDataPackage schemas/heritage-data-package-v1.json
+
+      - name: Setup Python
+        uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install codegen dependencies
+        run: uv pip install datamodel-code-generator
+
+      - name: Generate Pydantic models
+        run: python scripts/generate_python.py
+
+      - name: Build distribution
+        run: |
+          cd python/heritage_models
+          uvx --from build pyproject-build --outdir dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: python/heritage_models/dist/
