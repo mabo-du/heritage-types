@@ -165,11 +165,58 @@ model DigitalAsset {
     scale?: string;
 }
 
+// ── SchemaVer scalar ─────────────────────────────────────────────────────────
+// Format: MODEL-REVISION-ADDITION (e.g. "1-0-0")
+// MODEL increments on breaking changes, REVISION on non-breaking additions,
+// ADDITION on purely additive changes (new optional fields only).
+
+@pattern("^\\d+-\\d+-\\d+$")
+scalar SchemaVer extends string;
+
+// ── Agent types (W3C PROV-O inspired) ────────────────────────────────────────
+
+enum AgentType {
+    Human,
+    AIModel,
+    Software,
+}
+
+@jsonSchema
+model ProvenanceAgent {
+    id: uuid;
+    agentType: AgentType;
+    name: string;           // e.g. "Mark Bouck" or "paleo-id-v1"
+    version?: string;       // software version
+    modelId?: string;       // for AI agents: model identifier
+}
+
+@jsonSchema
+model ProvenanceActivity {
+    id: uuid;
+    activityType: string;   // e.g. "SpeciesIdentification", "AgeModelling"
+    startedAtTime?: datetime;
+    agent: ProvenanceAgent;
+}
+
+@jsonSchema
+model ProvenanceRecord {
+    entity: uuid;                       // ID of the record being described
+    wasGeneratedBy?: ProvenanceActivity;
+    wasAttributedTo?: ProvenanceAgent;
+    generatedAtTime: datetime;
+    @minValue(0.0)
+    @maxValue(1.0)
+    confidence?: float32;               // 0.0–1.0, for AI-generated assertions
+    notes?: string;
+}
+
 @jsonSchema
 model HeritageDataPackage {
-    schemaVersion: string;
+    schemaVersion: SchemaVer;           // REQUIRED — e.g. "1-0-0"
     createdAt: datetime;
-    provenance?: string;
+    updatedAt?: datetime;
+    provenance?: string;                // legacy string provenance note
+    provenanceLog?: ProvenanceRecord[]; // append-only assertion log
     metadata?: SiteMetadata;
     contexts: StratigraphicUnit[];
     relationships: StratigraphicRelationship[];

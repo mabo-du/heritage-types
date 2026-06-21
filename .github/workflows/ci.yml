@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test-python:
+    name: pytest (heritage-models + heritage-vocab)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dev dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install datamodel-code-generator pytest
+          pip install -e python/heritage_models
+          pip install -e python/heritage_vocab
+      - name: Build schemas + models + vocab
+        run: |
+          # Compile TypeSpec → JSON Schema
+          npm ci
+          mkdir -p schemas
+          npx tsp compile . \
+            --emit @typespec/json-schema \
+            --option "@typespec/json-schema.file-type=json" \
+            --option "@typespec/json-schema.bundleId=HeritageDataPackage"
+          # Inline external refs + hoist scalars before mv
+          PYTHONPATH=scripts python scripts/_inline_schema.py schemas/HeritageDataPackage
+          mv schemas/HeritageDataPackage schemas/heritage-data-package-v1.json
+          # Regenerate the Python package
+          PYTHONPATH=scripts python scripts/generate_python.py
+      - name: Run pytest
+        run: PYTHONPATH=scripts python -m pytest tests/ -v
+
+  test-typescript:
+    name: tsc --noEmit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Regenerate TS interfaces
+        run: |
+          npm ci
+          mkdir -p schemas
+          npx tsp compile . \
+            --emit @typespec/json-schema \
+            --option "@typespec/json-schema.file-type=json" \
+            --option "@typespec/json-schema.bundleId=HeritageDataPackage"
+          PYTHONPATH=scripts python scripts/_inline_schema.py schemas/HeritageDataPackage
+          mv schemas/HeritageDataPackage schemas/heritage-data-package-v1.json
+          PYTHONPATH=scripts python scripts/generate_typescript.py
+      - name: Install TypeScript
+        run: npm install --no-save typescript@5.4
+      - name: Typecheck
+        working-directory: typescript
+        run: npx tsc --noEmit -p .

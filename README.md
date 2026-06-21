@@ -18,12 +18,15 @@ pip install heritage-models
 
 Provides Pydantic v2 models for all core heritage data types:
 - `StratigraphicUnit` — archaeological context sheet data
+- `StratigraphicRelationship` — stratigraphic relationships (cuts, fills, equals)
 - `Find` — artefact records
 - `Sample` — environmental/C14/isotopic sample data
 - `Chronology` — calibrated radiocarbon dates
-- `StratigraphicRelationship` — stratigraphic relationships (cuts, fills, equals)
 - `DigitalAsset` — photographs, drawings, GIS layers
 - `SiteMetadata` — project-level metadata
+- `ProvenanceAgent` — agent identity (Human / AIModel / Software) for who/what created a record
+- `ProvenanceActivity` — named action performed by a `ProvenanceAgent`
+- `ProvenanceRecord` — per-record audit-trail entry (entity, activity, agent, time, confidence)
 - `HeritageDataPackage` — full project container for cross-tool exchange
 
 ### Python: `heritage-vocab`
@@ -41,7 +44,16 @@ result = svc.normalise_material("flint")
 
 ### TypeScript: `@heritage/types`
 
-TypeScript interfaces for web-based tools (StratiGraph, Libby frontend). Published from this repository's `typescript/` directory.
+> **Status: private, not published.** The `typescript/` directory contains
+> auto-generated TypeScript interfaces for web-based tools (StratiGraph,
+> Libby frontend). Consumers should add it as a path or vendor
+> `typescript/src/index.ts` directly — it is **not** on npm at this time
+> because no consumer has yet needed a packaged distribution. See
+> `RELEASE.md` for the policy.
+
+### JSON Schema
+
+Canonical JSON Schema files in `schemas/` — language-agnostic, usable from any programming environment for data validation.
 
 ### JSON Schema
 

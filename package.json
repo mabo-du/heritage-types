@@ -1,6 +1,6 @@
 {
   "name": "heritage-types",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Canonical heritage science data models — TypeSpec source, JSON Schema output, auto-generated Python and TypeScript packages",
   "type": "module",
   "scripts": {

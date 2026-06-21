@@ -1,7 +1,7 @@
 {
   "name": "@heritage/types",
-  "version": "1.0.0",
-  "description": "Auto-generated TypeScript types from heritage-types canonical schemas",
+  "version": "2.0.0",
+  "description": "Canonical heritage science data models \u2014 TypeSpec source, JSON Schema output, auto-generated Python and TypeScript packages",
   "main": "src/index.ts",
   "types": "src/index.ts",
   "private": true

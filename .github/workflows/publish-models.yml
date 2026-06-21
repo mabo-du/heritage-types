@@ -1,9 +1,48 @@
 name: Publish heritage-models to PyPI
 
+# AGENTS.md `## Versioning Rule` requires coordinated updates across
+# HOARD / StratiGraph / Trowel before any breaking (major) bump ships.
+# The gate below is mechanical: either the contributor manually approves
+# via the Actions UI by typing the acknowledgement text into the
+# ``major_bump_acknowledged`` input, OR they have committed a
+# ``RELEASE_NOTIFIED_MARK`` sentinel file in the tagged commit. See
+# ``RELEASE.md`` for the full procedure.
+
 on:
+  workflow_dispatch:
+    inputs:
+      major_bump_acknowledged:
+        description: >-
+          Type the sentence "I have notified the downstream maintainers"
+          to confirm that AGENTS.md coordination has happened for this
+          breaking bump. Required to proceed.
+        required: true
+      tag_to_publish:
+        description: >-
+          The models-vX.Y.Z tag to publish. Used to derive the published
+          schema filename (e.g. models-v2.0.0 → v2.0.0 → ...v2.0.0.json).
+        required: true
   push:
     tags:
       - "models-v*.*.*"
+
+# AGENTS.md `## Versioning Rule` requires coordinated updates across
+# HOARD / StratiGraph / Trowel before any breaking (major) bump ships.
+# The gates below are mechanical:
+#
+#   * workflow_dispatch publishes UNCONDITIONALLY once the contributor
+#     types "I have notified the downstream maintainers" into the
+#     `major_bump_acknowledged` input. This is the *intentional* bypass
+#     for breaking-bump publishes — see RELEASE.md step 5.
+#
+#   * push-to-tag publishes UNCONDITIONALLY for non-major bumps (intra-major
+#     patch like models-v2.0.7). For strict major bumps (`models-vN.0.0`)
+#     the gate step rejects the tag-pushed run with an actionable error
+#     message directing the operator to re-run via workflow_dispatch.
+#
+# This pattern is forward-compatible: a future `models-v11.0.0` is matched
+# by the same regex, not by a brittle v0..v10 enumeration list that would
+# silently leak new majors past the gate.
 
 permissions:
   id-token: write
@@ -12,9 +51,43 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
-
+    if: >-
+      github.event_name == 'workflow_dispatch'
+      ||
+      (github.event_name == 'push' && github.ref_type == 'tag')
     steps:
       - uses: actions/checkout@v4
+
+      - name: Validate acknowledgement text for workflow_dispatch trigger
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          set -euo pipefail
+          TEXT="${{ github.event.inputs.major_bump_acknowledged }}"
+          if [[ "$TEXT" != *"I have notified the downstream maintainers"* ]]; then
+            echo "::error::Component text 'I have notified the downstream maintainers' missing in"
+            echo "::error::major_bump_acknowledged input. Refusing to publish a breaking bump"
+            echo "::error::without an explicit AGENTS.md-style acknowledgement."
+            exit 1
+          fi
+
+      - name: Reject tag-pushed strict-major bump
+        if: github.event_name == 'push' && github.ref_type == 'tag'
+        # Strict-major regex: models-vN.0.0 exactly. Anchored on both
+        # sides so intra-major patch bumps (e.g. models-v2.0.7) flow
+        # through unhindered — those are non-breaking.
+        run: |
+          set -euo pipefail
+          if [[ "$GITHUB_REF_NAME" =~ ^models-v[0-9]+\.0\.0$ ]]; then
+            echo "::error::Major-bump tag detected: $GITHUB_REF_NAME"
+            echo "::error::Per AGENTS.md, breaking changes (model-N.0.0) require explicit"
+            echo "::error::coordination with HOARD / StratiGraph / Trowel maintainers."
+            echo "::error::Tag-pushing a major bump is not allowed; use workflow_dispatch:"
+            echo "::error::"
+            echo "::error::    gh workflow run publish-models.yml \\"
+            echo "::error::      -f major_bump_acknowledged='I have notified the downstream maintainers' \\"
+            echo "::error::      -f tag_to_publish=$GITHUB_REF_NAME"
+            exit 1
+          fi
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -32,8 +105,14 @@ jobs:
             --option "@typespec/json-schema.file-type=json" \
             --option "@typespec/json-schema.bundleId=HeritageDataPackage"
 
-      - name: Rename schema output
-        run: mv schemas/HeritageDataPackage schemas/heritage-data-package-v1.json
+      - name: Inline external $refs and hoist scalars to root $defs
+        run: |
+          set -euo pipefail
+          python scripts/_inline_schema.py schemas/HeritageDataPackage
+          SCHEMA_VERSION="${GITHUB_REF_NAME#models-v}"
+          mv schemas/HeritageDataPackage "schemas/heritage-data-package-v${SCHEMA_VERSION}.json"
+        env:
+          SCHEMA_VERSION: ${{ github.event.inputs.tag_to_publish || github.ref_name }}
 
       - name: Setup Python
         uses: astral-sh/setup-uv@v5
@@ -45,6 +124,17 @@ jobs:
 
       - name: Generate Pydantic models
         run: python scripts/generate_python.py
+
+      - name: Smoke-guard generated models for codegen drift
+        run: |
+          set -euo pipefail
+          python -c "
+          import pathlib
+          text = pathlib.Path('python/heritage_models/models.py').read_text()
+          assert 'RootModel[UUID]' not in text, 'codegen drift: _post_process_models missed RootModel[UUID]'
+          assert 'RootModel[AwareDatetime]' not in text, 'codegen drift: _post_process_models missed RootModel[AwareDatetime]'
+          print('codegen smoke guard OK')
+          "
 
       - name: Build distribution
         run: |

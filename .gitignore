@@ -5,3 +5,9 @@ dist/
 tsp-output/
 .DS_Store
 python/heritage_models/*.egg-info
+
+# TypeSpec emitter treats bundleId as a relative URL → leaks subdirs.
+https:/
+
+# Cache & Carry's vocabulary DB when cached locally for dev.
+*.vocab_cache.db

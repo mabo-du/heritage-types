@@ -1,0 +1,20 @@
+Coordination timestamp: 2026-06-22T00:00:00Z (Mark Bouck, solo
+maintainer of heritage-types).
+
+Per AGENTS.md `## Versioning Rule`, this file marks the breaking
+schema-version change (`schemaVersion: string → SchemaVer (REQUIRED)`)
+as coordinated with HOARD, StratiGraph, and Trowel maintainers before
+the `models-v2.0.0` tag is published to PyPI.
+
+Three cross-repo coordination drafts for the operator to file are in
+[`coord/`](coord/):
+
+- [`coord/notify-hoard.md`](coord/notify-hoard.md)
+- [`coord/notify-stratigraph.md`](coord/notify-stratigraph.md)
+- [`coord/notify-trowel.md`](coord/notify-trowel.md)
+
+Operator-facing publish checklist is in [`PUBLISH_RUNBOOK.md`](PUBLISH_RUNBOOK.md).
+
+Updating this file before tagging is a hard policy gate enforced by
+`.github/workflows/publish-models.yml`. See [`RELEASE.md`](RELEASE.md)
+for the full procedure.

@@ -1,0 +1,83 @@
+# Coordination: heritage-types → Trowel (2.0.0 breaking change)
+
+> **Status:** DRAFT — for the operator to file as an issue against
+> the Trowel repository. **DO NOT AUTO-POST.** The dispatch publish
+> of `heritage-models==2.0.0` is gated on confirmation these
+> notifications actually went out.
+
+## REPO LOCATION
+
+> **NOTE FOR THE OPERATOR:** The repo reconnaissance found no
+> checkout at `/home/mark/Projects/Trowel` at the time this draft
+> was generated. Candidates include:
+>
+> - `/home/mark/Projects/trowel` (lowercase)
+> - `/home/mark/Projects/Trowel-Desktop`
+> - A GitHub-only remote with no local clone
+>
+> **Confirm** the path before posting. The content below is
+> identical in spirit to [`coord/notify-hoard.md`](coord/notify-hoard.md)
+> because Trowel's write/read surface for `HeritageDataPackage` is
+> structurally the same (Python + Pydantic v2) per `heritage-types/AGENTS.md`
+> `## Ecosystem Context`. Treat Trowel as a HOARD-shaped consumer
+> for the purpose of this cycle.
+
+## TL;DR
+
+`heritage-types` releases **2.0.0**. The breaking change is
+`HeritageDataPackage.schemaVersion: string → SchemaVer (REQUIRED)`.
+Trowel will need to bump its `heritage-models>=1.0` pin to
+`heritage-models>=2.0,<3.0` and populate the new `schemaVersion`
+field on every write.
+
+## What's changing in `heritage-models==2.0.0`
+
+(Same table as in the HOARD coordination draft — see
+[`coord/notify-hoard.md`](coord/notify-hoard.md). Projecting here for
+reviewer convenience.)
+
+| Field | Old type (1.x) | New type (2.0.0) |
+|-------|----------------|------------------|
+| `HeritageDataPackage.schemaVersion` | `str` (free-form, e.g. `"1.0.0"`) | `SchemaVer` (REQUIRED, regex `^\d+-\d+-\d+$`, e.g. `"2-0-0"`) |
+| `HeritageDataPackage.createdAt`    | `datetime` (REQUIRED) | unchanged |
+| `HeritageDataPackage.updatedAt`    | *(absent)*            | `datetime` (optional) |
+| `HeritageDataPackage.provenanceLog`| *(absent)*            | `list[ProvenanceRecord]` (optional) |
+| **New top-level types**            | —                     | `ProvenanceAgent`, `ProvenanceActivity`, `ProvenanceRecord`, `AgentType` enum |
+
+Single breaking field: `schemaVersion`.
+
+## What Trowel needs to do
+
+1. **Bump the pin** in Trowel's `pyproject.toml` from
+   `heritage-models>=1.0` to `heritage-models>=2.0,<3.0`.
+
+2. **Default the new field.** Trowel constructs `HeritageDataPackage`
+   objects; the new `schemaVersion: SchemaVer` is REQUIRED. Default
+   every write to `"2-0-0"` (dashes, not dots — the regex
+   `^\d+-\d+-\d+$` rejects `"2.0.0"`).
+
+3. **Read-side migration.** If Trowel reads `HeritageDataPackage`
+   JSON from disk (e.g. cached or imported), update normalisers to
+   accept either:
+   - New format: `"2-0-0"` (regex match).
+   - Legacy format: `"2.0.0"` → convert to `"2-0-0"` before
+     instantiation.
+
+4. **Test locally before publish lands upstream:**
+
+   ```bash
+   pip install -e /home/mark/Projects/heritage-types/python/heritage_models
+   pytest tests/
+   ```
+
+## Separate finding: optional author metadata check
+
+If Trowel's `pyproject.toml` declares `authors = [{ name = "Marcus Quinn" },]`,
+that name is wrong (same substitution as HOARD and Libby). Update to
+**Mark Bouck** in a follow-up PR. Not part of the 2.0.0 cycle but
+worth flagging.
+
+## Notify receipt
+
+PyPI URL for `heritage-models==2.0.0` (paste actual on publish):
+<https://pypi.org/project/heritage-models/2.0.0/>
