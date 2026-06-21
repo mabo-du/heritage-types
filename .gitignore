@@ -5,3 +5,10 @@ dist/
 tsp-output/
 .DS_Store
 python/heritage_models/*.egg-info
+
+# aidevops runtime artifacts
+.agents/loop-state/
+.agents/tmp/
+.agents/memory/
+.aidevops.json
+.beads

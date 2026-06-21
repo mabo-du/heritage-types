@@ -1,5 +1,20 @@
 # heritage-types
 
+<!-- aidevops:badges:start -->
+<!-- managed by aidevops badges; edit the template, not this block -->
+<!-- Build & Quality Status -->
+
+<!-- License & Legal -->
+[![License](https://img.shields.io/badge/license-see%20file-yellow.svg)](https://github.com/mabo-du/heritage-types/blob/main/LICENSE)
+
+<!-- Repository Metrics -->
+[![Lines of code](https://raw.githubusercontent.com/mabo-du/heritage-types/main/.github/badges/loc-total.svg)](https://github.com/mabo-du/heritage-types)
+[![Languages by lines of code](https://raw.githubusercontent.com/mabo-du/heritage-types/main/.github/badges/loc-languages.svg)](https://github.com/mabo-du/heritage-types)
+
+<!-- Project Links -->
+[![GitHub repository](https://img.shields.io/badge/github-repository-181717.svg?logo=github)](https://github.com/mabo-du/heritage-types)
+<!-- aidevops:badges:end -->
+
 **Canonical data models for the HOARD heritage science ecosystem.**
 
 This repository is not a standalone product. It is an infrastructure dependency that provides shared data type definitions used by multiple projects in the ecosystem. End users should never need to interact with this repository directly — the Python package (`heritage-models`) is installed automatically as a dependency of HOARD.
