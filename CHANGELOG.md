@@ -54,8 +54,9 @@
   refuses to overwrite them. Bit-exact closure at PyPI will happen
   at the next version-bump that is published against a clean
   registry state — i.e. one where no pre-existing bytes for that
-  version conflict with the gate's local-rebuild SHA256, so the
-  gate emits `skip=true` from the first dispatch.
+  version conflict with the gate's local-rebuild SHA256, so  the gate emits `skip=true` from the first dispatch.
+
+[2.0.3]: https://github.com/mabo-du/heritage-types/releases/tag/v2.0.3
 
 ## [2.0.2] — 2026-06-22
 
