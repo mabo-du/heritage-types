@@ -1,4 +1,4 @@
-name: Publish @heritage/types to npm
+name: Publish @mabo-du/heritage-types to npm
 
 # Same gating as publish-models.yml: strict-major bumps require
 # explicit workflow_dispatch with acknowledgement text.
@@ -68,6 +68,7 @@ jobs:
         with:
           node-version: "22"
           cache: npm
+          registry-url: https://registry.npmjs.org
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -114,7 +115,6 @@ jobs:
           cd typescript
           VERSION=$(node -p "require('./package.json').version")
           echo "==> Publishing @mabo-du/heritage-types@${VERSION}"
-          npm install --no-audit --no-fund
           # Native npm publish: avoids JS-DevTools/npm-publish@v3 (unmaintained
           # since 2022; known to silently swallow errors with granular tokens
           # and exit 0 even when the registry rejects the upload).
