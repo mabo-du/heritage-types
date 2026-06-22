@@ -101,9 +101,27 @@ jobs:
           # to find the `tsc` binary regardless of where npm hoists it.
           npm run verify
 
+      - name: Derive commit epoch for reproducible builds
+        id: epoch
+        # PEP 517 reproducible-builds convention applied to npm tarballs:
+        # https://reproducible-builds.org/specs/source-date-epoch/
+        # npm pack (8+) reads SOURCE_DATE_EPOCH for tar entry mtime
+        # stamping, allowing the registry's dist.shasum to be byte-stable
+        # across re-runs of the same commit.
+        run: |
+          set -euo pipefail
+          echo "epoch=$(git log -1 --format=%ct)" >> "$GITHUB_OUTPUT"
+
       - name: Build dist for npm
+        env:
+          SOURCE_DATE_EPOCH: ${{ steps.epoch.outputs.epoch }}
         run: |
           cd typescript
+          # SOURCE_DATE_EPOCH propagates through `npm run build` so the
+          # downstream `npm pack` in Check npm registry idempotency
+          # produces a tarball whose entry mtimes are pinned to the
+          # commit epoch — matches publish-models.yml / publish-vocab.yml
+          # post-cef633c discipline.
           npm run build
 
       # Idempotency gate: re-pushing the same tag should turn the workflow
