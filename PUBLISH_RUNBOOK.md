@@ -190,7 +190,7 @@ gh workflow run publish-models.yml \
 ## Did this runbook actually run?
 
 - `heritage-models==2.0.3`: https://pypi.org/project/heritage-models/2.0.3/
-- `heritage-vocab==2.0.3`: https://pypi.org/project/heritage-vocab/2.0.3/  *(pending publish — see coord/notify-trowel.md; the publishing pipeline is a separate workflow outside publish-models.yml.)*
+- `heritage-vocab==2.0.3`: https://pypi.org/project/heritage-vocab/2.0.3/
 
 All three downstream coordination issues filed with version links.
 
