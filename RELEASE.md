@@ -91,21 +91,50 @@ policy. Tagging without sending notifications costs you the explicit
 text acknowledgement in the dispatch UI; tagging a major bump
 without `RELEASE_NOTIFIED_MARK` fails the gate.
 
-## `@heritage/types` TypeScript package
+## `@mabo-du/heritage-types` TypeScript package
 
-The TypeScript package remains **private** (`typescript/package.json`
-contains `"private": true`). It is not published to npm, despite
-older README mentions to the contrary. Consumers should add it as a
-path dependency or vendor `typescript/src/index.ts` directly.
+The TypeScript package is **public on npm since v2.0.1**. Published
+at [`@mabo-du/heritage-types`](https://www.npmjs.com/package/@mabo-du/heritage-types)
+under the `mabo-du` (the maintainer's) personal npm scope. This is a
+workaround because the `@heritage/` npm scope does not yet exist on
+npmjs; when it does, the package will move to `@heritage/types`
+(requires a coordinated cross-consumer migration per
+[`AGENTS.md ## Versioning Rule`](AGENTS.md)).
 
-If StratiGraph needs a packaged distribution in the future, the
-setup path is:
+The publish workflow is
+[`.github/workflows/publish-typescript.yml`](.github/workflows/publish-typescript.yml),
+which mirrors `publish-models.yml`:
 
-1. Remove `"private": true` from `typescript/package.json`.
-2. Add a `publish-types.yml` workflow analogous to
-   `publish-models.yml` (gated by the same RELEASE_NOTIFIED_MARK
-   sentinel policy above).
-3. Update this `RELEASE.md` and `AGENTS.md` to reflect "now public".
+- `Derive commit epoch` step exposes `steps.epoch.outputs.epoch`.
+- `SOURCE_DATE_EPOCH` is bound on **both** the Build step and the
+  "Check npm registry idempotency" step (GH Actions `env:` is
+  step-scoped, so both bindings are required for `npm pack`'s tar
+  entry mtime stamping to be reproducible across re-runs).
+- "Check npm registry idempotency" step compares the rebuilt
+  tarball's `dist.shasum` against npm's stored one; publish exits
+  via `skip=true` (`conclusion=success`, no overwrite) when bytes
+  match.
+
+Consumers can either:
+
+- `npm install @mabo-du/heritage-types` — npm path (current, preferred
+  for new projects).
+- Continue vendoring `typescript/src/index.ts` directly — vendor path
+  (legacy; pre-2.0.1 only).
+
+Both paths are first-class per [`AGENTS.md ## Ecosystem Context`](AGENTS.md).
+
+### Future migration to `@heritage/types`
+
+When the `@heritage/` npm scope is granted to the maintainer:
+
+1. Update `typescript/package.json` `name` field to `@heritage/types`.
+2. Bump in lockstep with Python manifests. This is a cross-package
+   rename; [`AGENTS.md ## Versioning Rule`](AGENTS.md) requires
+   coordinated updates across HOARD, StratiGraph, Trowel.
+3. Refresh `coord/notify-typescript-npm.md` for the migration.
+
+Until then, the `@mabo-du/heritage-types` path remains canonical.
 
 ## Hot-fix path
 
