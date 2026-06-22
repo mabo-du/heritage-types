@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.0.1] — 2026-06-22
+
+### Fixed
+
+- **PyPI wheel packaging**: both `heritage-models` and `heritage-vocab` wheels
+  were placing source files at the wheel root instead of inside the package
+  namespace directory (e.g. `models.py` at root vs `heritage_models/models.py`).
+  This caused `pip install` to succeed but `import heritage_models` to fail
+  with `ModuleNotFoundError`. Fixed by adding `[tool.setuptools.packages]` and
+  `[tool.setuptools.package-dir]` mappings to both `pyproject.toml` files.
+
 ## [2.0.0] — 2026-06-22
 
 ### ⚠️ BREAKING — coordinate with HOARD, StratiGraph, Trowel before tagging
