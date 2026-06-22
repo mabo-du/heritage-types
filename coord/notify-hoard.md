@@ -1,93 +1,84 @@
-# Coordination: heritage-types → HOARD (2.0.0 breaking change)
+# Coordination: heritage-types \u2192 HOARD (2.0.3 + 2.0.4 patches)
 
-> **Status:** DRAFT — for the operator to file as an issue against
-> `/home/mark/Projects/HOARD` (or post as a comment on the equivalent
-> upstream repo if upstream lives elsewhere). **DO NOT AUTO-POST**.
-> The dispatch publish of `heritage-models==2.0.0` is gated on
-> confirmation that these notifications actually went out.
+> **Status:** OUTBOUND \u2014 ready for `gh issue create --repo mabo-du/HOARD`.
+> Companion playbook: [`PUBLISH_RUNBOOK.md`](https://github.com/mabo-du/heritage-types/blob/main/PUBLISH_RUNBOOK.md).
 
 ## TL;DR
 
-`heritage-types` releases **2.0.0** at the publish timestamp above.
-The change `schemaVersion: string → SchemaVer (REQUIRED)` is a wire-
-format breaking change for any `HeritageDataPackage` JSON your
-tooling writes or reads. You will need to bump your pin from
-`heritage-models>=1.0` to `heritage-models>=2.0,<3.0` and populate
-the new field.
+`heritage-types` has **published 2.0.3 and 2.0.4** as non-breaking
+patch-level releases since the coordinated 2.0.0 cycle. **No
+consumer action is required** for HOARD.
 
-The sentinel `RELEASE_NOTIFIED_MARK` in `/home/mark/Projects/heritage-types`
-pins the coordination timestamp. PyPI URL draft below — replace with
-actual on publish.
+- `heritage-models==2.0.3, 2.0.4` \u2014 pure CI-side hardening, no schema or
+  model surface changes versus 2.0.2 / 2.0.0.
+- `heritage-vocab==2.0.3, 2.0.4` \u2014 same.
+- `@mabo-du/heritage-types==2.0.3, 2.0.4` \u2014 same (vendor path or
+  `npm install` path; both are first-class per AGENTS.md).
 
-## What's changing in `heritage-models==2.0.0`
+## What changed in `heritage-models` between 2.0.2 and 2.0.4
 
-| Field | Old type (1.x) | New type (2.0.0) |
-|-------|----------------|------------------|
-| `HeritageDataPackage.schemaVersion` | `str` (free-form, e.g. `"1.0.0"`) | `SchemaVer` (REQUIRED, regex `^\d+-\d+-\d+$`, e.g. `"2-0-0"`) |
-| `HeritageDataPackage.createdAt`    | `datetime` (REQUIRED) | unchanged |
-| `HeritageDataPackage.updatedAt`    | *(absent)*            | `datetime` (optional) |
-| `HeritageDataPackage.provenance`   | `str` (optional, legacy note) | unchanged |
-| `HeritageDataPackage.provenanceLog`| *(absent)*            | `list[ProvenanceRecord]` (optional, append-only audit log) |
-| `StratigraphicUnit` etc.           | unchanged             | unchanged |
-| **New top-level types**            | —                     | `ProvenanceAgent`, `ProvenanceActivity`, `ProvenanceRecord`, `AgentType` enum (`Human`/`AIModel`/`Software`) |
+Nothing consumer-facing. The full diff is in
+`publish-models.yml`, `publish-vocab.yml`, and `publish-typescript.yml`:
 
-The `schemaVersion` rename is the **only** field-level removal. Every
-other change is purely additive.
+- `env: SOURCE_DATE_EPOCH: ${{ steps.epoch.outputs.epoch }}` \u2014 wheel
+  ZIP mtime is git-committer-time (commit-deterministic).
+- `env: TZ: UTC` \u2014 `time.localtime(SOURCE_DATE_EPOCH)` is host-TZ
+  reproducible across dispatch and local-rebuild.
+- `umask 022` \u2014 `ZipInfo.external_attr` (Unix mode bits) is
+  host-umask reproducible.
+- `uvx --from build==1.5.0` is pinned on both Python workflows
+  so the wheel archive writer is version-stable.
+- A new "Check PyPI registry idempotency" step in
+  `publish-models.yml` and `publish-vocab.yml` compares the
+  rebuilt wheel's `sha256` against PyPI's per-version published
+  `sha256`. `Publish to PyPI` exits via `skip=true` (`conclusion
+  = success`, no overwrite) when bytes match, and fails with
+  `##[error]Aborting publish to prevent silent corruption` when
+  bytes drift. This protects immutable PyPI release bytes from
+  accidental corruption by CI re-runs across environments.
+- An analogous gate on `publish-typescript.yml` for the npm
+  registry (`dist.shasum` comparison against
+  `registry.npmjs.org/@mabo-du%2Fheritage-types/<version>`).
 
-## What HOARD needs to do
+## Recommended HOARD action
 
-1. **Bump the pin** in `pyproject.toml` from
+None. `heritage-models>=2.0,<3.0` already in your pin will pick
+up 2.0.3 + 2.0.4 transparently. If you're pinned to
+`heritage-models==2.0.0` or `heritage-models==2.0.2` and want
+the post-hardening releases, you can opt in:
 
-   ```toml
-   dependencies = [
-       ...
-       "heritage-models>=1.0",
-       ...
-   ]
-   ```
+```toml
+"heritage-models>=2.0.4,<3.0",  # or pin to ==2.0.4 for stability
+```
 
-   to
+The `<3.0` upper bound is unchanged from prior guidance; the
+only breaking changes remain those communicated with the 2.0.0
+release (per https://github.com/mabo-du/heritage-types/releases/tag/v2.0.0).
 
-   ```toml
-   dependencies = [
-       ...
-       "heritage-models>=2.0,<3.0",
-       ...
-   ]
-   ```
+## Bit-exact closure proof (operational detail)
 
-2. **Update every write site** that constructs a `HeritageDataPackage`
-   in code. The new field is **REQUIRED** — silent omission will be
-   rejected on validation. Default it to `"2-0-0"` (semver-as-tuple):
-   `model-version = "2"`, `revision = "0"`, `addition = "0"`. The
-   pattern is `\d+-\d+-\d+`, so `"2.0.0"` will NOT match — convert
-   dots to dashes before persisting.
+The 24-byte archival delta observed on `2.0.3` wheels relative
+to pre-hardening builds is **not data corruption** \u2014 it is the
+gate's protective refusal to overwrite immutable 2.0.3 PyPI
+bytes with the hardened pipeline's slightly different ZIP
+metadata. `2.0.4` is the first version published against a
+clean PyPI registry state, so the gate emits `proceeding with
+publish` (`skip=false`) on first dispatch, and reduces to
+`skip=true; conclusion=success` on a re-dispatch against the
+same commit. This proves bit-exact closure of the prior drift.
 
-3. **Update every read site** that previously accepted a free-form
-   `schemaVersion` string. Pydantic v2 will now reject anything that
-   does not match the regex. Be defensive: if down-conversion is
-   needed, normalise `"2.0.0" → "2-0-0"` before instantiation.
+## Reference
 
-4. **Test against local heritage-types 2.0.0** before the upstream PyPI
-   upload takes effect:
-
-   ```bash
-   # In HOARD, switch to a local editable install of heritage-types
-   pip install -e /home/mark/Projects/heritage-types/python/heritage_models
-   pytest tests/
-   ```
-
-## What HOARD does NOT need to do
-
-- No code changes to `heritage_vocab` consumers — `heritage-vocab==2.0.0`
-  only changes the fallback URI scheme; the search API is identical.
-- No changes to `@mabo-du/heritage-types` — StratiGraph owns that path.
-- No changes to `Chronology`/`Sample`/`Find` shapes — unchanged.
+- CHANGELOG: https://github.com/mabo-du/heritage-types/blob/main/CHANGELOG.md
+- v2.0.3 release: https://github.com/mabo-du/heritage-types/releases/tag/v2.0.3
+- v2.0.4 release: https://github.com/mabo-du/heritage-types/releases/tag/v2.0.4
+- `heritage-models` 2.0.4: https://pypi.org/project/heritage-models/2.0.4/
+- `heritage-vocab` 2.0.4: https://pypi.org/project/heritage-vocab/2.0.4/
 
 ## Separate finding: author metadata in your `pyproject.toml`
 
-While auditing for cross-repo compliance with this coordination thread,
-I noticed that `HOARD/pyproject.toml` declares:
+While auditing cross-repo compliance, I noticed
+`HOARD/pyproject.toml` declares:
 
 ```toml
 authors = [
@@ -95,28 +86,18 @@ authors = [
 ]
 ```
 
-This name is wrong. The canonical attribution for this codebase and
-the HOARD ecosystem is **Mark Bouck** (see `LICENSE`, the heritage-types
-`AGENTS.md`, and the HOARD `AGENTS.md` "Owner" line). The erroneous
-attribution appears to be a substitution by an automated tool that
-hallucinated a different author name. **Suggest updating to:**
+This name is wrong. The canonical attribution is **Mark Bouck**
+per `LICENSE`, `heritage-types/AGENTS.md`, and your own
+`HOARD/AGENTS.md` "Owner" line. The erroneous name appears to
+be a substitution by an automated tool that hallucinated
+a different author. Update to:
 
 ```toml
 authors = [
     { name = "Mark Bouck" },
-    { name = "Solomon Bouck" },  # if a co-maintainer exists
+    # any co-maintainers
 ]
 ```
 
-The same `Marcus Quinn` substitution appears in `Libby/pyproject.toml`.
-Both fixes are independent of the 2.0.0 coordination cycle and can
-ship in their own PRs — but they're worth flagging here so they don't
-get lost.
-
-## Notify receipt
-
-PyPI URL for `heritage-models==2.0.0` (paste actual on publish):
-<https://pypi.org/project/heritage-models/2.0.0/>
-
-PyPI URL for `heritage-vocab==2.0.0` (paste actual on publish):
-<https://pypi.org/project/heritage-vocab/2.0.0/>
+This is independent of the 2.0.4 cycle and can ship in its own
+PR.

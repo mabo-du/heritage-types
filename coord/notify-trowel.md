@@ -1,83 +1,82 @@
-# Coordination: heritage-types → Trowel (2.0.0 breaking change)
+# Coordination: heritage-types \u2192 Trowel (2.0.3 + 2.0.4 patches)
 
-> **Status:** DRAFT — for the operator to file as an issue against
-> the Trowel repository. **DO NOT AUTO-POST.** The dispatch publish
-> of `heritage-models==2.0.0` is gated on confirmation these
-> notifications actually went out.
-
-## REPO LOCATION
-
-> **NOTE FOR THE OPERATOR:** The repo reconnaissance found no
-> checkout at `/home/mark/Projects/Trowel` at the time this draft
-> was generated. Candidates include:
->
-> - `/home/mark/Projects/trowel` (lowercase)
-> - `/home/mark/Projects/Trowel-Desktop`
-> - A GitHub-only remote with no local clone
->
-> **Confirm** the path before posting. The content below is
-> identical in spirit to [`coord/notify-hoard.md`](coord/notify-hoard.md)
-> because Trowel's write/read surface for `HeritageDataPackage` is
-> structurally the same (Python + Pydantic v2) per `heritage-types/AGENTS.md`
-> `## Ecosystem Context`. Treat Trowel as a HOARD-shaped consumer
-> for the purpose of this cycle.
+> **Status:** OUTBOUND \u2014 ready for `gh issue create --repo mabo-du/trowel`.
+> Companion playbook: [`PUBLISH_RUNBOOK.md`](https://github.com/mabo-du/heritage-types/blob/main/PUBLISH_RUNBOOK.md).
 
 ## TL;DR
 
-`heritage-types` releases **2.0.0**. The breaking change is
-`HeritageDataPackage.schemaVersion: string → SchemaVer (REQUIRED)`.
-Trowel will need to bump its `heritage-models>=1.0` pin to
-`heritage-models>=2.0,<3.0` and populate the new `schemaVersion`
-field on every write.
+`heritage-types` has **published 2.0.3 and 2.0.4** as non-breaking
+patch-level releases since the coordinated 2.0.0 cycle.
+**No consumer action is required** for Trowel.
 
-## What's changing in `heritage-models==2.0.0`
+- `heritage-models==2.0.3, 2.0.4` \u2014 pure CI-side hardening, no schema or
+  model surface changes versus 2.0.2 / 2.0.0.
+- `heritage-vocab==2.0.3, 2.0.4` \u2014 same.
+- `@mabo-du/heridge-types==2.0.3, 2.0.4` \u2014 same (Trowel is Python
+  + Pydantic v2 per `heritage-types/AGENTS.md ## Ecosystem Context`,
+  so the npm package is not on the critical path; vendor or
+  `pip install` work unchanged).
 
-(Same table as in the HOARD coordination draft — see
-[`coord/notify-hoard.md`](coord/notify-hoard.md). Projecting here for
-reviewer convenience.)
+## What changed in `heritage-models` between 2.0.2 and 2.0.4
 
-| Field | Old type (1.x) | New type (2.0.0) |
-|-------|----------------|------------------|
-| `HeritageDataPackage.schemaVersion` | `str` (free-form, e.g. `"1.0.0"`) | `SchemaVer` (REQUIRED, regex `^\d+-\d+-\d+$`, e.g. `"2-0-0"`) |
-| `HeritageDataPackage.createdAt`    | `datetime` (REQUIRED) | unchanged |
-| `HeritageDataPackage.updatedAt`    | *(absent)*            | `datetime` (optional) |
-| `HeritageDataPackage.provenanceLog`| *(absent)*            | `list[ProvenanceRecord]` (optional) |
-| **New top-level types**            | —                     | `ProvenanceAgent`, `ProvenanceActivity`, `ProvenanceRecord`, `AgentType` enum |
+Nothing consumer-facing. The full diff is in
+`publish-models.yml`, `publish-vocab.yml`, and `publish-typescript.yml`
+(all in `https://github.com/mabo-du/heritage-types`):
 
-Single breaking field: `schemaVersion`.
+- `env: SOURCE_DATE_EPOCH: ${{ steps.epoch.outputs.epoch }}` \u2014 wheel
+  ZIP mtime is git-committer-time (commit-deterministic).
+- `env: TZ: UTC` \u2014 `time.localtime(SOURCE_DATE_EPOCH)` is host-TZ
+  reproducible across dispatch and local-rebuild.
+- `umask 022` \u2014 `ZipInfo.external_attr` (Unix mode bits) is
+  host-umask reproducible.
+- `uvx --from build==1.5.0` is pinned on both Python workflows.
+- New "Check PyPI registry idempotency" step on both Python
+  workflows: the rebuilt wheel's `sha256` is compared against
+  PyPI's per-version published `sha256`. `Publish to PyPI`
+  exits via `skip=true` when bytes match, and fails with
+  `##[error]Aborting publish to prevent silent corruption` when
+  bytes drift. Protects immutable PyPI bytes from accidental
+  corruption by CI re-runs.
+- An analogous gate on `publish-typescript.yml` for the npm
+  registry.
 
-## What Trowel needs to do
+## Recommended Trowel action
 
-1. **Bump the pin** in Trowel's `pyproject.toml` from
-   `heritage-models>=1.0` to `heritage-models>=2.0,<3.0`.
+None. Your existing pin pattern (per
+`heritage-types/AGENTS.md ## Ecosystem Context` \u2014 Trowel
+treats `heritage-models` as `optional, hoard group`) will pick
+up 2.0.3 + 2.0.4 transparently. If you've pinned to
+`heritage-models==2.0.0` or `==2.0.2` and want post-hardening:
 
-2. **Default the new field.** Trowel constructs `HeritageDataPackage`
-   objects; the new `schemaVersion: SchemaVer` is REQUIRED. Default
-   every write to `"2-0-0"` (dashes, not dots — the regex
-   `^\d+-\d+-\d+$` rejects `"2.0.0"`).
+```toml
+"heritage-models>=2.0.4,<3.0",  # or pin to ==2.0.4 for stability
+```
 
-3. **Read-side migration.** If Trowel reads `HeritageDataPackage`
-   JSON from disk (e.g. cached or imported), update normalisers to
-   accept either:
-   - New format: `"2-0-0"` (regex match).
-   - Legacy format: `"2.0.0"` → convert to `"2-0-0"` before
-     instantiation.
+The `<3.0` upper bound is unchanged; only breaking changes remain
+those communicated with the 2.0.0 release (per
+https://github.com/mabo-du/heritage-types/releases/tag/v2.0.0),
+notably the `schemaVersion: string \u2192 SchemaVer (REQUIRED)` migration
+that Trowel would have absorbed in the 2.0.0 cycle.
 
-4. **Test locally before publish lands upstream:**
+## Bit-exact closure proof
 
-   ```bash
-   pip install -e /home/mark/Projects/heritage-types/python/heritage_models
-   pytest tests/
-   ```
+A 24-byte archival delta exists between post-hardening local
+rebuilds and the 2.0.3 PyPI wheels. It is **not data corruption**
+\u2014 it is the gate's protective refusal to overwrite the immutable
+2.0.3 PyPI bytes with the hardened pipeline's slightly different
+ZIP metadata. `2.0.4` is the first version published against a
+clean PyPI registry state, demonstrating bit-exact closure at the
+next patch level.
 
-## Separate finding: optional author metadata check
+## Reference
 
-If Trowel's `pyproject.toml` declares `authors = [{ name = "Marcus Quinn" },]`,
-that name is wrong (same substitution as HOARD and Libby). Update to
-**Mark Bouck** in a follow-up PR. Not part of the 2.0.0 cycle but
-worth flagging.
+- CHANGELOG: https://github.com/mabo-du/heritage-types/blob/main/CHANGELOG.md
+- v2.0.3 release: https://github.com/mabo-du/heritage-types/releases/tag/v2.0.3
+- v2.0.4 release: https://github.com/mabo-du/heritage-types/releases/tag/v2.0.4
 
-## Notify receipt
+## Separate finding: author metadata check
 
-PyPI URL for `heritage-models==2.0.0` (paste actual on publish):
-<https://pypi.org/project/heritage-models/2.0.0/>
+If `Trowel/pyproject.toml` declares `authors = [{ name = "Marcus Quinn" },]`,
+that name is wrong (same substitution as HOARD and Libby).
+Update to **Mark Bouck** in a follow-up PR. Independent of this
+2.0.4 cycle.
