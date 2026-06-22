@@ -68,6 +68,79 @@ Use Gate A for breaking major bumps. Gate B is reserved for non-major bumps like
 `models-v2.0.7` (intra-major patch) where tag-push auto-publishing is
 acceptable because there is no breaking-change risk.
 
+## Gate C — PyPI registry idempotency
+
+Every publish-models workflow run executes a "Check PyPI registry
+idempotency" step that decides whether to:
+
+* **skip upload** (`skip=true` → publish step exits early, run green);
+* **upload** (release not yet on PyPI, or wheel filename not yet uploaded); or
+* **abort with `::error`** (existing PyPI wheel bytes differ from local).
+
+The decision is per-wheel. For each `*.whl` in
+`python/heritage_models/dist/`, the step pulls
+`https://pypi.org/pypi/heritage-models/json` to a local `pypi_info.json`
+and runs a `jq` query against it:
+
+```bash
+REMOTE_HASH=$(jq -r ".releases[\"${VERSION}\"] // [] | .[] | \
+    select(.filename == \"${WHEEL_NAME}\") | \
+    .digests.sha256 // empty" pypi_info.json)
+```
+
+If `REMOTE_HASH` is empty, the wheel is treated as "not yet on PyPI;
+will publish." If it equals the local `sha256sum`, the wheel is treated
+as "matching; skip=true." If it differs, the step `::error::`s and aborts.
+
+### `jq` null-safety — DO NOT regress
+
+A previous version of this query used the tautological form
+`.releases["${VERSION}"][]` against the same JSON. That **crashes with
+`jq: error: Cannot iterate over null (null)` (exit 5)** whenever
+`${VERSION}` is absent from `pypi_info.json.releases` — i.e. *exactly
+the fresh-version publish case the gate is supposed to advance through
+seamlessly*. In practice this caused every first-time `workflow_dispatch`
+of a brand-new version to halt at this gate for the wrong reason,
+before the if/elif/else chain could choose the "not yet on PyPI;
+will publish" branch.
+
+The textbook null-safe idiom is the alternative operator plus an empty
+array:
+
+```jq
+.releases["<VERSION>"] // []   # alternative: when null → use []
+| .[]                          # iterate (possibly empty) array
+| select(.filename == "<WHEEL_NAME>")
+| .digests.sha256 // empty
+```
+
+**Never** revert to `.releases["${VERSION}"][]` — it will re-break every
+fresh-version publish. The `// [] | .[]` pair is a hard jq idiom,
+not a style choice.
+
+If you need to tweak the gate's filter, dry-run it against the live
+PyPI manifest first:
+
+```bash
+# fetch live data once
+curl -fsSL https://pypi.org/pypi/heritage-models/json -o /tmp/pypi_info.json
+
+# absent-version case (the one that catches the bug)
+jq -r '.releases["0.0.0"] // [] | .[] \
+    | select(.filename == "heritage_models-0.0.0-py3-none-any.whl") \
+    | .digests.sha256 // empty' /tmp/pypi_info.json
+# expected: empty output, exit 0
+
+# present-version case (must still return a real sha256)
+jq -r '.releases["2.0.3"] // [] | .[] \
+    | select(.filename == "heritage_models-2.0.3-py3-none-any.whl") \
+    | .digests.sha256 // empty' /tmp/pypi_info.json
+# expected: a 64-char hex string
+```
+
+If your new query errors on the absent-version case, your change has
+reintroduced the bug.
+
 ## Coordination evidence
 
 The `RELEASE_NOTIFIED_MARK` sentinel file at the repo root contains the
