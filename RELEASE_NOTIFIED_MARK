@@ -18,3 +18,39 @@ Operator-facing publish checklist is in [`PUBLISH_RUNBOOK.md`](PUBLISH_RUNBOOK.m
 Updating this file before tagging is a hard policy gate enforced by
 `.github/workflows/publish-models.yml`. See [`RELEASE.md`](RELEASE.md)
 for the full procedure.
+
+---
+
+## Supplemental: 2.0.3 + 2.0.4 (post-`cef633c` hardening cycle)
+
+Coordination timestamp: 2026-06-22T00:00:00Z (Mark Bouck, solo
+maintainer of heritage-types). Notifications sent and published:
+
+- HOARD: https://github.com/mabo-du/HOARD/issues/8
+- Trowel: https://github.com/mabo-du/trowel/issues/15
+
+PyPI publishes complete:
+- heritage-models 2.0.4: https://pypi.org/project/heritage-models/2.0.4/
+- heritage-vocab 2.0.4: https://pypi.org/project/heritage-vocab/2.0.4/
+- @mabo-du/heritage-types 2.0.4 (npm): https://registry.npmjs.org/@mabo-du%2Fheritage-types/2.0.4
+
+Per AGENTS.md `## Versioning Rule`, the 2.0.3 + 2.0.4 cycle is a
+non-breaking patch-level release:
+
+- no schema, model, or public Python/TypeScript API surface changes
+  versus 2.0.2 / 2.0.0;
+- pure CI-side hardening completion (`SOURCE_DATE_EPOCH` + `TZ: UTC`
+  + `umask 022` + pinned `build==1.5.0` on the Python workflows;
+  mirroring `SOURCE_DATE_EPOCH` discipline on the npm workflow +
+  PyPI/npm registry-idempotency gates);
+- bit-exact closure demonstrated for both PyPI and npm paths (a
+  re-dispatch of the relevant workflow against the same commit emits
+  `skip=true; conclusion=success`).
+
+StratiGraph repository is private per AGENTS.md; the 2.0.0 cycle was
+filed as [StratiGraph #16](https://github.com/mabo-du/stratigraph/issues/16)
+when the repo profile was different. The 2.0.3 + 2.0.4 cycle uses
+direct-channel coord with the StratiGraph maintainer (see
+[`coord/notify-stratigraph.md`](coord/notify-stratigraph.md) for the
+messaging). Cross-repo coordination drafts and superseded versions
+live in [`coord/`](coord/).
