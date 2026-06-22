@@ -68,6 +68,7 @@ jobs:
         with:
           node-version: "22"
           cache: npm
+          cache-dependency-path: package.json typescript/package.json
           registry-url: https://registry.npmjs.org
 
       - name: Setup Python
@@ -118,4 +119,4 @@ jobs:
           # Native npm publish: avoids JS-DevTools/npm-publish@v3 (unmaintained
           # since 2022; known to silently swallow errors with granular tokens
           # and exit 0 even when the registry rejects the upload).
-          npm publish --access public --provenance
+          npm publish --access public --provenance --tag latest
