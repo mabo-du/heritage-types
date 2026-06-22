@@ -1,4 +1,4 @@
-# heritage-types 2.0.1 — Operator Publish Runbook
+# heritage-types 2.0.2 — Operator Publish Runbook
 
 > **Ownership & authority.** This runbook is for **Mark Bouck**, who
 > maintains the heritage-types repository. If a coding agent produced
@@ -9,7 +9,7 @@
 > publish `heritage-models` and `heritage-vocab` to
 > PyPI from this repo via GitHub Actions. The mechanical gate is
 > in `.github/workflows/publish-models.yml`; this runbook is the
-> human-facing checklist. Current release: **2.0.1**.
+> human-facing checklist. Current release: **2.0.2**.
 
 ## Pre-flight check
 
@@ -19,7 +19,7 @@ Before running anything, confirm:
 |------|---------|----------|
 | Working tree clean | `git status --short` | no output |
 | Branch | `git rev-parse --abbrev-ref HEAD` | `main` |
-| All four manifests at 2.0.1 | `grep -n '^version' package.json python/heritage_models/pyproject.toml python/heritage_vocab/pyproject.toml typescript/package.json` | `2.0.1` everywhere |
+| All four manifests at 2.0.2 | `grep -n '^version' package.json python/heritage_models/pyproject.toml python/heritage_vocab/pyproject.toml typescript/package.json` | `2.0.2` everywhere |
 | Tests green | `pytest tests/ -q` | `76 passed` |
 | `tsc` clean | `cd typescript && npx tsc --noEmit -p .` | exit 0, no output |
 | Sentinel present | `ls -l RELEASE_NOTIFIED_MARK` | non-empty file |
@@ -93,7 +93,7 @@ If the published release corrupts consumer payloads:
 
    ```bash
    pip install twine
-   twine yank heritage-models 2.0.1
+   twine yank heritage-models 2.0.2
    ```
 
 2. Re-issue under a new *minor* version that restores backwards compat
@@ -116,8 +116,8 @@ gh workflow run publish-models.yml \
 
 ## Did this runbook actually run?
 
-- `heritage-models==2.0.1`: https://pypi.org/project/heritage-models/2.0.1/
-- `heritage-vocab==2.0.1`: https://pypi.org/project/heritage-vocab/2.0.1/
+- `heritage-models==2.0.2`: https://pypi.org/project/heritage-models/2.0.2/
+- `heritage-vocab==2.0.2`: https://pypi.org/project/heritage-vocab/2.0.2/
 
 All three downstream coordination issues filed with version links.
 

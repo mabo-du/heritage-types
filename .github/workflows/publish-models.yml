@@ -128,7 +128,17 @@ jobs:
         # the same input).
         run: uv pip install datamodel-code-generator==0.65.0
 
+      - name: Derive commit epoch for reproducible builds
+        id: epoch
+        # PEP 517 reproducible-builds convention:
+        # https://reproducible-builds.org/specs/source-date-epoch/
+        run: |
+          set -euo pipefail
+          echo "epoch=$(git log -1 --format=%ct)" >> "$GITHUB_OUTPUT"
+
       - name: Generate Pydantic models
+        env:
+          SOURCE_DATE_EPOCH: ${{ steps.epoch.outputs.epoch }}
         run: python scripts/generate_python.py
 
       - name: Smoke-guard generated models for codegen drift
