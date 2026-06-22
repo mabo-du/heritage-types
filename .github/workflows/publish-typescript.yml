@@ -1,0 +1,108 @@
+name: Publish @heritage/types to npm
+
+# Same gating as publish-models.yml: strict-major bumps require
+# explicit workflow_dispatch with acknowledgement text.
+# Non-major tag pushes auto-publish.
+
+on:
+  workflow_dispatch:
+    inputs:
+      major_bump_acknowledged:
+        description: >-
+          Type the sentence "I have notified the downstream maintainers"
+          to confirm that AGENTS.md coordination has happened for this
+          breaking bump. Required to proceed.
+        required: true
+      tag_to_publish:
+        description: >-
+          The models-vX.Y.Z tag to publish. Used for version tracking.
+        required: true
+  push:
+    tags:
+      - "models-v*.*.*"
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    if: >-
+      github.event_name == 'workflow_dispatch'
+      ||
+      (github.event_name == 'push' && github.ref_type == 'tag')
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate acknowledgement text for workflow_dispatch trigger
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          set -euo pipefail
+          TEXT="${{ github.event.inputs.major_bump_acknowledged }}"
+          if [[ "$TEXT" != *"I have notified the downstream maintainers"* ]]; then
+            echo "::error::Component text 'I have notified the downstream maintainers' missing in"
+            echo "::error::major_bump_acknowledged input. Refusing to publish a breaking bump"
+            echo "::error::without an explicit AGENTS.md-style acknowledgement."
+            exit 1
+          fi
+
+      - name: Reject tag-pushed strict-major bump
+        if: github.event_name == 'push' && github.ref_type == 'tag'
+        run: |
+          set -euo pipefail
+          if [[ "$GITHUB_REF_NAME" =~ ^models-v[0-9]+\.0\.0$ ]]; then
+            echo "::error::Major-bump tag detected: $GITHUB_REF_NAME"
+            echo "::error::Per AGENTS.md, breaking changes require explicit"
+            echo "::error::coordination with HOARD / StratiGraph / Trowel maintainers."
+            echo "::error::Tag-pushing a major bump is not allowed; use workflow_dispatch:"
+            echo "::error::"
+            echo "::error::    gh workflow run publish-typescript.yml \\"
+            echo "::error::      -f major_bump_acknowledged='I have notified the downstream maintainers' \\"
+            echo "::error::      -f tag_to_publish=$GITHUB_REF_NAME"
+            exit 1
+          fi
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install TypeSpec dependencies
+        run: npm ci
+
+      - name: Compile TypeSpec -> JSON Schema
+        run: |
+          npx tsp compile . \
+            --emit @typespec/json-schema \
+            --option "@typespec/json-schema.file-type=json" \
+            --option "@typespec/json-schema.bundleId=HeritageDataPackage"
+
+      - name: Inline external $refs and hoist scalars
+        run: |
+          set -euo pipefail
+          python scripts/_inline_schema.py schemas/HeritageDataPackage
+          mv schemas/HeritageDataPackage schemas/heritage-data-package-v1.json
+
+      - name: Generate TypeScript types
+        run: python scripts/generate_typescript.py
+
+      - name: Verify generated types compile
+        run: |
+          cd typescript
+          npm install
+          npx tsc --noEmit -p .
+
+      - name: Build dist for npm
+        run: |
+          cd typescript
+          npm run build
+
+      - name: Publish to npm
+        uses: JS-DevTools/npm-publish@v3
+        with:
+          token: ${{ secrets.NPM_TOKEN }}
+          package: typescript
+          access: public
+          provenance: true
