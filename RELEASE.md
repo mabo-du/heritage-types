@@ -124,11 +124,10 @@ See [`PUBLISH_RUNBOOK.md ## Roll-back`](PUBLISH_RUNBOOK.md) for the manual path.
 
 The TypeScript package is **public on npm since v2.0.1**. Published
 at [`@mabo-du/heritage-types`](https://www.npmjs.com/package/@mabo-du/heritage-types)
-under the `mabo-du` (the maintainer's) personal npm scope. This is a
-workaround because the `@heritage/` npm scope does not yet exist on
-npmjs; when it does, the package will move to `@heritage/types`
-(requires a coordinated cross-consumer migration per
-[`AGENTS.md ## Versioning Rule`](AGENTS.md)).
+under the maintainer's personal `mabo-du` npm scope — this is the
+canonical permanent home. The `@heritage/` npmjs scope is **not**
+part of the roadmap; the package name is `mabo-du/heritage-types`
+for the foreseeable future.
 
 The publish workflow is
 [`.github/workflows/publish-typescript.yml`](.github/workflows/publish-typescript.yml),
@@ -162,8 +161,6 @@ When the `@heritage/` npm scope is granted to the maintainer:
    rename; [`AGENTS.md ## Versioning Rule`](AGENTS.md) requires
    coordinated updates across HOARD, StratiGraph, Trowel.
 3. Refresh `coord/notify-typescript-npm.md` for the migration.
-
-Until then, the `@mabo-du/heritage-types` path remains canonical.
 
 ## Hot-fix path
 

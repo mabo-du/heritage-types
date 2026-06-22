@@ -51,7 +51,7 @@ make typescript # Regenerate TypeScript types from JSON Schema
 |---------|----------|--------------|-----------|
 | `heritage-models` | Python (Pydantic v2) | `pip install hoard` | `pip install heritage-models` |
 | `heritage-vocab` | Python | `pip install hoard` | `pip install heritage-models` |
-| `@mabo-du/heritage-types` | TypeScript | `npm install` | `@mabo-du/heritage-types` *(workaround scope: `@heritage/` is unregistered on npmjs; will move to `@heritage/types` when scope lands. See [RELEASE.md](RELEASE.md) for migration plan)* |
+| `@mabo-du/heritage-types` | TypeScript | `npm install` | `@mabo-du/heritage-types` *(permanent canonical scope under mabo-du's personal npm account; the `@heritage/` scope is **not** pursued)* |
 
 ---
 
