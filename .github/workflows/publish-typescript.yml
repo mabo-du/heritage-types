@@ -97,7 +97,12 @@ jobs:
         run: |
           cd typescript
           npm install
-          ./node_modules/.bin/tsc --noEmit -p .
+          # Use `npm exec --no --package=typescript tsc` because npm hoists
+          # typescript to the repo-root node_modules/ (when `npm ci` already
+          # created one), so `./node_modules/.bin/tsc` does not exist.
+          # `--no` prevents fetching from the registry (the real `tsc` is in
+          # the `typescript` package, not the deprecated `tsc` package).
+          npm exec --no --package=typescript -- tsc --noEmit -p .
 
       - name: Build dist for npm
         run: |
