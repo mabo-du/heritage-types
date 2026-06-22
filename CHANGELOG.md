@@ -1,5 +1,27 @@
 # Changelog
 
+## [2.0.4] — 2026-06-22
+
+### Notes
+
+- `2.0.3 → 2.0.4` is a non-breaking patch-level release: no
+  schema, model, or public Python/TypeScript API surface changes.
+  Consumer pins (`heritage-models==2.0.x`, `heritage-vocab==2.0.x`,
+  `@mabo-du/heritage-types` vendoring) do not need to change.
+  Pure publish-pipeline completion: the on-PyPI `2.0.3` wheels
+  remain correct content; `2.0.4` publishes fresh wheels built
+  by the recently-hardened pipeline against an empty version
+  slot on PyPI, so the gate's idempotency check correctly emits
+  `proceeding with publish` rather than refusing to overwrite
+  the pre-existing `2.0.3` bytes with the slightly different
+  archival metadata produced by the recently-hardened pipeline.
+- The protective fact `2.0.3` demonstrated — that the gate
+  refuses to overwrite incompatible bytes with silent corruption —
+  still applies. `2.0.4` is just the first version where the gate
+  has no pre-existing bytes to compare against, so its first-mode
+  behaviour is `publish, no protection needed`,  and a re-dispatch against the same commit reduces to
+  `skip=true; conclusion=success`.
+
 ## [2.0.3] — 2026-06-22
 
 ### Fixed
