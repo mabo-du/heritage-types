@@ -25,3 +25,9 @@ typescript/package-lock.json
 .cursor/cache/
 .hk/
 .env
+
+# Local bead-tracking (operator-only; never commit).
+# NB: .env.example is intentionally NOT gitignored — it is the
+# committed template that collaborators copy to .env (which IS
+# gitignored). Adding .env.example to .gitignore defeats its purpose.
+.beads/
