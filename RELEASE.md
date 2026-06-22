@@ -7,7 +7,7 @@
 
 This runbook describes the procedure for shipping a new release of
 `heritage-models` and `heritage-vocab` to PyPI, plus the
-`@heritage/types` typescript package status.
+`@mabo-du/heritage-types` TypeScript package.
 
 ## Versioning rule
 
@@ -151,16 +151,6 @@ Consumers can either:
   (legacy; pre-2.0.1 only).
 
 Both paths are first-class per [`AGENTS.md ## Ecosystem Context`](AGENTS.md).
-
-### Future migration to `@heritage/types`
-
-When the `@heritage/` npm scope is granted to the maintainer:
-
-1. Update `typescript/package.json` `name` field to `@heritage/types`.
-2. Bump in lockstep with Python manifests. This is a cross-package
-   rename; [`AGENTS.md ## Versioning Rule`](AGENTS.md) requires
-   coordinated updates across HOARD, StratiGraph, Trowel.
-3. Refresh `coord/notify-typescript-npm.md` for the migration.
 
 ## Hot-fix path
 

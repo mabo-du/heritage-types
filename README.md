@@ -44,14 +44,11 @@ result = svc.normalise_material("flint")
 
 ### TypeScript: `@mabo-du/heritage-types`
 
-> **Status: published to npm since v2.0.1.** The `typescript/` directory
-> contains auto-generated TypeScript interfaces for web-based tools
-> (StratiGraph, Libby frontend). Published at
-> [`@mabo-du/heritage-types`](https://www.npmjs.com/package/@mabo-du/heritage-types)
-> under the package-author's personal npm scope (since the `@heritage/`
-> npm scope is unregistered on npmjs; will move to `@heritage/types`
-> when the scope lands — see [RELEASE.md](RELEASE.md) for the migration
-> plan). Consumers can either `npm install @mabo-du/heritage-types` or
+> **Published to npm since v2.0.1** as the canonical, permanent name at
+> [`@mabo-du/heritage-types`](https://www.npmjs.com/package/@mabo-du/heritage-types).
+> The `typescript/` directory contains auto-generated TypeScript
+> interfaces for web-based tools (StratiGraph, Libby frontend).
+> Consumers can either `npm install @mabo-du/heritage-types` or
 > continue vendoring `typescript/src/index.ts`; both paths are
 > first-class per [`AGENTS.md ## Ecosystem Context`](AGENTS.md).
 
