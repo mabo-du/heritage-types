@@ -1,4 +1,4 @@
-# heritage-types 2.0.0 — Operator Publish Runbook
+# heritage-types 2.0.1 — Operator Publish Runbook
 
 > **Ownership & authority.** This runbook is for **Mark Bouck**, who
 > maintains the heritage-types repository. If a coding agent produced
@@ -6,10 +6,10 @@
 > [`AGENTS.md`](AGENTS.md) for the canonical attribution.
 >
 > **What this runbook does.** It assembles the exact command(s) to
-> publish `heritage-models==2.0.0` and `heritage-vocab==2.0.0` to
+> publish `heritage-models` and `heritage-vocab` to
 > PyPI from this repo via GitHub Actions. The mechanical gate is
 > in `.github/workflows/publish-models.yml`; this runbook is the
-> human-facing checklist.
+> human-facing checklist. Current release: **2.0.1**.
 
 ## Pre-flight check
 
@@ -19,17 +19,17 @@ Before running anything, confirm:
 |------|---------|----------|
 | Working tree clean | `git status --short` | no output |
 | Branch | `git rev-parse --abbrev-ref HEAD` | `main` |
-| All four manifests at 2.0.0 | `grep -n '^version' package.json python/heritage_models/pyproject.toml python/heritage_vocab/pyproject.toml typescript/package.json` | `2.0.0` everywhere |
-| Tests green | `pytest tests/ -q` | `33 passed` (now `38` once `tests/test_gate_verifier.py` is in scope) |
+| All four manifests at 2.0.1 | `grep -n '^version' package.json python/heritage_models/pyproject.toml python/heritage_vocab/pyproject.toml typescript/package.json` | `2.0.1` everywhere |
+| Tests green | `pytest tests/ -q` | `76 passed` |
 | `tsc` clean | `cd typescript && npx tsc --noEmit -p .` | exit 0, no output |
 | Sentinel present | `ls -l RELEASE_NOTIFIED_MARK` | non-empty file |
 
 If any item is wrong, STOP and resolve before continuing.
 
-## Gate A — workflow_dispatch (RECOMMENDED for v2.0.0)
+## Gate A — workflow_dispatch (for breaking bumps)
 
-This is the **only way** to publish a strict-major bump (`models-v2.0.0`,
-`models-v11.0.0`, etc.) from `main` without breaking the AGENTS.md gate.
+This is the **only way** to publish a strict-major bump (`models-vN.0.0`)
+from `main` without breaking the AGENTS.md gate.
 The gate step in CI requires the literal acknowledgement string in the
 `major_bump_acknowledged` input — **you type it yourself**, no shortcut.
 
@@ -37,7 +37,7 @@ The gate step in CI requires the literal acknowledgement string in the
 gh workflow run publish-models.yml \
     --ref main \
     -f major_bump_acknowledged='I have notified the downstream maintainers' \
-    -f tag_to_publish=models-v2.0.0
+    -f tag_to_publish=models-vN.0.0
 ```
 
 After running, watch the run:
@@ -64,7 +64,7 @@ though the workflow file has `on.push.tags: 'models-v*.*.*'`. That's the
 intended behaviour: the gate step matches `^models-v[0-9]+\.0\.0$` and
 exits 1 with an actionable error pointing to this runbook.
 
-Use Gate A for v2.0.0. Gate B is reserved for non-major bumps like
+Use Gate A for breaking major bumps. Gate B is reserved for non-major bumps like
 `models-v2.0.7` (intra-major patch) where tag-push auto-publishing is
 acceptable because there is no breaking-change risk.
 
@@ -73,30 +73,27 @@ acceptable because there is no breaking-change risk.
 The `RELEASE_NOTIFIED_MARK` sentinel file at the repo root contains the
 coordination timestamp and a pointer back to this runbook. The CI gate
 verifies this file exists in the workflow's checkout tree when a strict
-major bump is detected via tag push — but for v2.0.0 we are using the
 dispatch path so the sentinel is documentation rather than a hard gate.
 
 Drafts of the cross-repo coordination notifications live in
 [`coord/`](coord/) and were prepared alongside this runbook:
 
-* `coord/notify-hoard.md`
-* `coord/notify-stratigraph.md`
-* `coord/notify-trowel.md`
+* `coord/notify-hoard.md` — filed as [HOARD #7](https://github.com/mabo-du/HOARD/issues/7)
+* `coord/notify-stratigraph.md` — filed as [StratiGraph #16](https://github.com/mabo-du/stratigraph/issues/16)
+* `coord/notify-trowel.md` — filed as [Trowel #14](https://github.com/mabo-du/trowel/issues/14)
 
 Each draft is intended to be opened as an issue (or PR comment) in the
-respective downstream repo's coordination channel. They do **not** auto-
-post; that's a human action.
+respective downstream repo's coordination channel. These have all been filed.
 
 ## Roll-back
 
-If the published release corrupts consumer payloads (pre-existing
-`HeritageDataPackage` JSON where `schemaVersion` was a free-form string):
+If the published release corrupts consumer payloads:
 
-1. Yank from PyPI (one-time action, not reversible, but safe):
+1. Yank from PyPI:
 
    ```bash
    pip install twine
-   twine yank heritage-models 2.0.0
+   twine yank heritage-models 2.0.1
    ```
 
 2. Re-issue under a new *minor* version that restores backwards compat
@@ -107,18 +104,20 @@ If the published release corrupts consumer payloads (pre-existing
 
 ## Hot-fix / patch path
 
-For a same-day fix to a published release:
+For a same-day fix to a published release, use workflow_dispatch.
+This works for any version (major or patch):
 
 ```bash
-git tag models-v2.0.1 -m 'hotfix: <short description>'
-git push --tags
+gh workflow run publish-models.yml \
+    --ref main \
+    -f major_bump_acknowledged='I have notified the downstream maintainers' \
+    -f tag_to_publish=models-v2.0.X
 ```
-
-The workflow will auto-publish because `models-v2.0.1` does **not**
-match `^models-v[0-9]+\.0\.0$`. No dispatch needed.
 
 ## Did this runbook actually run?
 
-After publishing, paste the PyPI URL of `heritage-models==2.0.0` and
-`heritage-vocab==2.0.0` into the `coord/` issue threads as the
-"coordinated and shipped" receipt.
+- `heritage-models==2.0.1`: https://pypi.org/project/heritage-models/2.0.1/
+- `heritage-vocab==2.0.1`: https://pypi.org/project/heritage-vocab/2.0.1/
+
+All three downstream coordination issues filed with version links.
+
