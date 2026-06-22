@@ -22,6 +22,8 @@
   behaviour is `publish, no protection needed`,  and a re-dispatch against the same commit reduces to
   `skip=true; conclusion=success`.
 
+[2.0.4]: https://github.com/mabo-du/heritage-types/releases/tag/v2.0.4
+
 ## [2.0.3] — 2026-06-22
 
 ### Fixed
