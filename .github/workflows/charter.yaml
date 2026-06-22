@@ -5,21 +5,17 @@ on:
     branches: [main]
 permissions:
   contents: read
-  # Note: `security-events: write` deliberately NOT granted. For
-  # heritage-types the suppressed `charter doctor` findings reference
-  # repo-level metadata (oversized AGENTS.md, tsc-as-test rationale)
-  # rather than a source-file line. GitHub Code Scanning rejects such
-  # SARIF results with:
-  #   `locationFromSarifResult: expected at least one location`
-  # Removing the write permission makes the SARIF upload silently drop
-  # rather than marking the workflow step as failed. Threshold check
-  # still runs and gates via the action's own exit code.
-# Note: a future operator re-adding `security-events: write` will
-# reintroduce the SARIF rejection described above.  If upstream
-# `use-charter/charter-action` fixes SARIF location metadata for
-# repo-level findings, this denylist can be relaxed; until then,
-# this workflow is intentionally advisory and `continue-on-error`
-# on the charter step catches any unrelated action-side regressions.
+# Note: `security-events: write` deliberately NOT granted. ALL charter
+# findings emit SARIF without source-file location metadata — drift
+# detection, oversized-AGENTS.md, .gitignore patterns, and missing-test
+# coverage all reference whole-file or whole-repo, never a source-file
+# line. GitHub Code Scanning rejects such results with:
+#   locationFromSarifResult: expected at least one location
+# Without the write permission the SARIF upload silently drops and the
+# threshold check still gates via the action's own exit code. If upstream
+# charter-action enriches SARIF location for repo-level findings, this
+# denylist can be relaxed AND `continue-on-error` removed from the
+# charter step below.
 jobs:
   charter:
     runs-on: ubuntu-latest
