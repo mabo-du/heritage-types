@@ -153,15 +153,28 @@ jobs:
           "
 
       - name: Build distribution
+        env:
+          SOURCE_DATE_EPOCH: ${{ steps.epoch.outputs.epoch }}
+          # TZ=UTC so time.localtime(SOURCE_DATE_EPOCH) returns the same
+          # date_time tuple across dispatch + local rebuilds; without
+          # this, the ZIP date_time is host-TZ-shifted (GH-Actions
+          # ubuntu-latest vs operator container produce different bytes).
+          TZ: UTC
         run: |
           cd python/heritage_models
           # SOURCE_DATE_EPOCH is the PEP 517 reproducible-builds convention:
           # # https://reproducible-builds.org/specs/source-date-epoch/
-          # Pinning it to the git commit epoch ensures the wheel's
-          # archive-mtime entries are identical across re-runs of the
-          # same commit, so the registry-idempotency gate's local-vs-
-          # remote SHA256 comparison can produce a stable skip=true path.
-          export SOURCE_DATE_EPOCH=$(git log -1 --format=%ct)
+          # Bound via steps.epoch.outputs.epoch (env above) — replaces the
+          # prior inline `export SOURCE_DATE_EPOCH=$(git log...)` so the
+          # epoch value matches exactly between this build invocation and
+          # the gate's sha256 comparison target.
+          #
+          # umask 022 normalises external_attr (Unix mode bits) across
+          # hosts; without it, setuptools stamps different mode values
+          # when host umask differs (ubuntu-latest default vs operator
+          # container), contributing to the 27-byte drift observed
+          # between local rebuild and PyPI on heritage-models==2.0.3.
+          umask 022
           # Pin build package so the wheel-archive write path is
           # byte-stable across re-runs. Mirror of the
           # datamodel-code-generator pin in Install codegen dependencies.
