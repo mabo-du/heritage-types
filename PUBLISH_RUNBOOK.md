@@ -26,6 +26,32 @@ Before running anything, confirm:
 
 If any item is wrong, STOP and resolve before continuing.
 
+## Authentication & secrets
+
+Publishing routes through three identifiers. Knowing which one is in play
+decodes `gh run` failures when a publish succeeds locally but fails in
+CI (or vice versa).
+
+| Registry                              | Workflow                  | Mechanism                                                    | Stored repo secret?                              |
+|---------------------------------------|---------------------------|--------------------------------------------------------------|--------------------------------------------------|
+| PyPI (`heritage-models`)              | `publish-models.yml`      | PyPI Trusted Publishing via OIDC (`permissions: id-token: write`) | **None**                                       |
+| PyPI (`heritage-vocab`)               | `publish-vocab.yml`       | PyPI Trusted Publishing via OIDC (`permissions: id-token: write`) | **None**                                       |
+| npm (`@mabo-du/heritage-types`)       | `publish-typescript.yml`  | `NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}`                  | `NPM_TOKEN` (operator-managed GitHub Secret)     |
+
+**Routine release publish is tag-driven** for all three. The operator does
+not provide credentials in the routine path — the workflow's
+`id-token: write` permission (PyPI) or stored `NPM_TOKEN` secret (npm) is
+what authenticates.
+
+There is no `PYPI_API_TOKEN` in this repo's GitHub Secrets page — by
+design. PyPI Trusted Publishing is the canonical auth path for the
+two Python packages.
+
+**Operator-token is still required** for the manual fallback operations
+that PyPI Trusted Publishing does NOT cover (Trusted Publishing is
+upload-only — it does not extend to destructive or workstation-originated
+operations). See [Roll-back](#roll-back) below.
+
 ## Gate A — workflow_dispatch (for breaking bumps)
 
 This is the **only way** to publish a strict-major bump (`models-vN.0.0`)
@@ -195,6 +221,47 @@ gh workflow run publish-models.yml \
     -f major_bump_acknowledged='I have notified the downstream maintainers' \
     -f tag_to_publish=models-v2.0.X
 ```
+
+## NPM_TOKEN rotation
+
+`secrets.NPM_TOKEN` is the operator-managed GitHub Secret consumed by
+`publish-typescript.yml` to authenticate to npmjs.com. The PyPI workflows
+do NOT use this secret (they use OIDC; see [Authentication & secrets](#authentication--secrets)).
+
+Rotate on a routine cadence **and** after any suspected exposure:
+
+1. **Generate a new npm Automation token.**
+   - Log into <https://www.npmjs.com/> as `mabo-du`.
+   - **Account → Access Tokens → Generate New Token → Automation**.
+   - Copy the new value into your password manager — never commit, never paste in chat/email/Slack.
+2. **Update the GitHub Secret.**
+   - Repository **Settings → Secrets and variables → Actions → `NPM_TOKEN` → Update**.
+   - Paste the new token value.
+3. **Sanity-check that no current release publish is mid-flight.**
+   ```bash
+   gh run list --workflow='publish-typescript.yml' --limit=3
+   ```
+   Wait for any in-progress runs to settle before rotating.
+4. **Revoke the old token.**
+   - npmjs.com **Account → Access Tokens → [old-token] → Revoke**.
+5. **After rotation, smoke-test the new token with a no-op run.**
+   ```bash
+   gh workflow run publish-typescript.yml --ref main
+   ```
+   This exercises the `secrets.NPM_TOKEN` resolution path on the new
+   token without publishing anything new (the idempotency gate catches
+   the no-op case).
+
+**Rotation cadence (TODO-OPERATOR-CONFIRM-this-cadence):**
+
+- **Routine:** every 90 days.
+- **Compromise suspected:** immediately, before triaging the rest of the incident timeline.
+- **Operator role change / handover:** pre-handover, alongside any other secrets the new operator needs.
+
+The 90-day rhythm above is a placeholder pending the operator's actual
+cadence policy. If your team prefers a different rhythm (annual, per-release,
+etc.), edit this section in this file and reference the cadence in
+[RELEASE.md ## Authentication model](RELEASE.md).
 
 ## Did this runbook actually run?
 

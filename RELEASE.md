@@ -91,6 +91,35 @@ policy. Tagging without sending notifications costs you the explicit
 text acknowledgement in the dispatch UI; tagging a major bump
 without `RELEASE_NOTIFIED_MARK` fails the gate.
 
+## Authentication model
+
+The publish workflows use different authentication paths per registry.
+Knowing which is which helps decode `gh run` failures when a publish
+succeeds locally but fails in CI (or vice versa).
+
+| Registry                              | Workflow                  | Mechanism                                                   | Stored repo secret?                              |
+|---------------------------------------|---------------------------|-------------------------------------------------------------|--------------------------------------------------|
+| PyPI (`heritage-models`)              | `publish-models.yml`      | PyPI Trusted Publishing via OIDC (`permissions: id-token: write`) | **None** — OIDC identity grants the upload     |
+| PyPI (`heritage-vocab`)               | `publish-vocab.yml`       | PyPI Trusted Publishing via OIDC (`permissions: id-token: write`) | **None**                                         |
+| npm (`@mabo-du/heritage-types`)       | `publish-typescript.yml`  | `NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}`                 | `NPM_TOKEN` (operator-managed, GitHub Secret)    |
+
+**Routine release publish is tag-driven** for all three. The operator does
+not provide credentials in the routine path — the workflow's
+`id-token: write` permission (PyPI) or stored `NPM_TOKEN` secret (npm) is
+what authenticates.
+
+**Operator-token is still required** for the manual fallback operations
+that PyPI Trusted Publishing does NOT cover (Trusted Publishing is
+upload-only — it does not extend to destructive or workstation-originated
+operations):
+
+- `twine yank` (retract an already-published wheel) — needs operator's
+  PyPI API token.
+- `twine upload` from a workstation — same.
+- `npm unpublish` — needs operator's npm token.
+
+See [`PUBLISH_RUNBOOK.md ## Roll-back`](PUBLISH_RUNBOOK.md) for the manual path.
+
 ## `@mabo-du/heritage-types` TypeScript package
 
 The TypeScript package is **public on npm since v2.0.1**. Published
