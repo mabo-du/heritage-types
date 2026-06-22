@@ -46,6 +46,7 @@ result = svc.normalise_material("flint")
 
 > **Published to npm since v2.0.1** as the canonical, permanent name at
 > [`@mabo-du/heritage-types`](https://www.npmjs.com/package/@mabo-du/heritage-types).
+> The `@heritage/` npmjs scope is **not** part of the roadmap.
 > The `typescript/` directory contains auto-generated TypeScript
 > interfaces for web-based tools (StratiGraph, Libby frontend).
 > Consumers can either `npm install @mabo-du/heritage-types` or
