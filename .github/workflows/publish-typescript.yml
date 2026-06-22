@@ -102,6 +102,7 @@ jobs:
       - name: Publish to npm
         uses: JS-DevTools/npm-publish@v3
         with:
+          token: ${{ secrets.NPM_TOKEN }}
           package: typescript
           access: public
           provenance: true
