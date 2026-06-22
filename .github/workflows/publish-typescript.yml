@@ -97,13 +97,8 @@ jobs:
         run: |
           cd typescript
           npm install
-          # Use `npm run verify` (defined in package.json scripts) so npm's
-          # own node-resolve handles the tsc binary path-walking. This is
-          # hoisting-safe: npm finds `tsc` whether it's in
-          # typescript/node_modules/ or hoisted to repo-root node_modules/.
-          # Previously tried `./node_modules/.bin/tsc` (failed because the
-          # binary is hoisted to root) and `npm exec --package=typescript`
-          # (failed because npm exec didn't walk up to root).
+          # `npm run verify` is hoist-safe: npm walks node-resolve upward
+          # to find the `tsc` binary regardless of where npm hoists it.
           npm run verify
 
       - name: Build dist for npm
@@ -112,9 +107,15 @@ jobs:
           npm run build
 
       - name: Publish to npm
-        uses: JS-DevTools/npm-publish@v3
-        with:
-          token: ${{ secrets.NPM_TOKEN }}
-          package: typescript
-          access: public
-          provenance: true
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          set -euo pipefail
+          cd typescript
+          VERSION=$(node -p "require('./package.json').version")
+          echo "==> Publishing @mabo-du/heritage-types@${VERSION}"
+          npm install --no-audit --no-fund
+          # Native npm publish: avoids JS-DevTools/npm-publish@v3 (unmaintained
+          # since 2022; known to silently swallow errors with granular tokens
+          # and exit 0 even when the registry rejects the upload).
+          npm publish --access public --provenance
