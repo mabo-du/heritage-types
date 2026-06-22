@@ -1,0 +1,88 @@
+name: Publish heritage-vocab to PyPI
+
+# Same gating policy as publish-models.yml: strict-major bumps require
+# workflow_dispatch with the AGENTS.md acknowledgement text.
+#
+# Tag pattern: vocab-vX.Y.Z (distinct from models-vX.Y.Z).
+
+on:
+  workflow_dispatch:
+    inputs:
+      major_bump_acknowledged:
+        description: >-
+          Type the sentence "I have notified the downstream maintainers"
+          to confirm that AGENTS.md coordination has happened for this
+          breaking bump. Required to proceed.
+        required: true
+      tag_to_publish:
+        description: >-
+          The vocab-vX.Y.Z tag to publish. Used to drive the published
+          version (e.g. vocab-v2.0.0 → 2.0.0).
+        required: true
+  push:
+    tags:
+      - "vocab-v*.*.*"
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    if: >-
+      github.event_name == 'workflow_dispatch'
+      ||
+      (github.event_name == 'push' && github.ref_type == 'tag')
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate acknowledgement text for workflow_dispatch trigger
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          set -euo pipefail
+          TEXT="${{ github.event.inputs.major_bump_acknowledged }}"
+          if [[ "$TEXT" != *"I have notified the downstream maintainers"* ]]; then
+            echo "::error::Component text 'I have notified the downstream maintainers' missing in"
+            echo "::error::major_bump_acknowledged input. Refusing to publish a breaking bump"
+            echo "::error::without an explicit AGENTS.md-style acknowledgement."
+            exit 1
+          fi
+
+      - name: Reject tag-pushed strict-major bump
+        if: github.event_name == 'push' && github.ref_type == 'tag'
+        # Strict-major regex: vocab-vN.0.0 exactly.
+        run: |
+          set -euo pipefail
+          if [[ "$GITHUB_REF_NAME" =~ ^vocab-v[0-9]+\.0\.0$ ]]; then
+            echo "::error::Major-bump tag detected: $GITHUB_REF_NAME"
+            echo "::error::Per AGENTS.md, breaking changes (vocab-N.0.0) require explicit"
+            echo "::error::coordination with HOARD / StratiGraph / Trowel maintainers."
+            echo "::error::Tag-pushing a major bump is not allowed; use workflow_dispatch:"
+            echo "::error::"
+            echo "::error::    gh workflow run publish-vocab.yml \\"
+            echo "::error::      -f major_bump_acknowledged='I have notified the downstream maintainers' \\"
+            echo "::error::      -f tag_to_publish=$GITHUB_REF_NAME"
+            exit 1
+          fi
+
+      - name: Setup Python
+        uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run tests
+        run: |
+          pip install pytest
+          pip install -e python/heritage_vocab
+          python -m pytest tests/test_heritage_vocab.py -v
+
+      - name: Build distribution
+        run: |
+          cd python/heritage_vocab
+          uvx --from build pyproject-build --outdir dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: python/heritage_vocab/dist/
