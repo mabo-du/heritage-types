@@ -134,6 +134,8 @@ jobs:
       #     silently overwriting a drifted prior build)
       - name: Check npm registry idempotency
         id: check_idemp
+        env:
+          SOURCE_DATE_EPOCH: ${{ steps.epoch.outputs.epoch }}
         run: |
           set -euo pipefail
           cd typescript
