@@ -51,7 +51,7 @@ make typescript # Regenerate TypeScript types from JSON Schema
 |---------|----------|--------------|-----------|
 | `heritage-models` | Python (Pydantic v2) | `pip install hoard` | `pip install heritage-models` |
 | `heritage-vocab` | Python | `pip install hoard` | `pip install heritage-models` |
-| `@heritage/types` | TypeScript | — | *(internal-only; vendor `typescript/src/index.ts` directly — see [RELEASE.md](RELEASE.md))* |
+| `@mabo-du/heritage-types` | TypeScript | — | *(internal-only; vendor `typescript/src/index.ts` directly — see [RELEASE.md](RELEASE.md))* |
 
 ---
 
@@ -80,7 +80,7 @@ This repo feeds into every tool in the HOARD ecosystem:
 | Tool | Uses | How |
 |------|------|-----|
 | **HOARD** | `heritage-models`, `heritage-vocab` | `pip install heritage-models` dep in pyproject.toml |
-| **StratiGraph** | `@heritage/types` *(vendored)* | Repository is **private**; StratiGraph vendors `typescript/src/index.ts` rather than installing from npm. See [RELEASE.md](RELEASE.md). |
+| **StratiGraph** | `@mabo-du/heritage-types` *(vendored)* | Repository is **private**; StratiGraph vendors `typescript/src/index.ts` rather than installing from npm. See [RELEASE.md](RELEASE.md). |
 | **Trowel** | `heritage-models` | `pip install heritage-models` dep (optional, hoard group) |
 | **Libby** | `heritage-models` | For `Chronology` output type |
 

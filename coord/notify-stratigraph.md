@@ -20,9 +20,9 @@ The `RELEASE_NOTIFIED_MARK` sentinel inside
 `/home/mark/Projects/heritage-types` pins the coordination timestamp.
 PyPI URL below — replace with actual on publish.
 
-## What's changing in `@heritage/types` from `heritage-types==2.0.0`
+## What's changing in `@mabo-du/heritage-types` from `heritage-types==2.0.0`
 
-(Note: `@heritage/types` is private — vendored, not on npm. The
+(Note: `@mabo-du/heritage-types` is private — vendored, not on npm. The
 authors of this repo should re-run `make all` in
 `/home/mark/Projects/heritage-types` and re-vendor
 `typescript/src/index.ts` into StratiGraph's source tree.)
@@ -85,7 +85,7 @@ SchemaVer`. Everything else is additive.
 
 ## What StratiGraph does NOT need to do
 
-- No dependency-version bump — `@heritage/types` is vendored, not a
+- No dependency-version bump — `@mabo-du/heritage-types` is vendored, not a
   package dependency.
 - No changes to React component code unless it constructs/reads a
   `HeritageDataPackage` directly. Most UI code operates on the

@@ -87,9 +87,10 @@
 
 ### Removed
 
-- TypeScript package no longer advertises `npm install @heritage/types` in
-  CI (the package remains `private: true`); see `M4` in REVIEW.md for the
-  followup.
+- TypeScript package `@mabo-du/heritage-types` is now published to npm.
+  Previously it was `private: true` and only vendored; it is now live on
+  the npm registry under your personal scope (since the `@heritage` npm
+  scope does not exist). M4 is resolved.
 
 ### Build / CI
 

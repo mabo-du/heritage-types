@@ -81,7 +81,7 @@ other change is purely additive.
 
 - No code changes to `heritage_vocab` consumers — `heritage-vocab==2.0.0`
   only changes the fallback URI scheme; the search API is identical.
-- No changes to `@heritage/types` — StratiGraph owns that path.
+- No changes to `@mabo-du/heritage-types` — StratiGraph owns that path.
 - No changes to `Chronology`/`Sample`/`Find` shapes — unchanged.
 
 ## Separate finding: author metadata in your `pyproject.toml`

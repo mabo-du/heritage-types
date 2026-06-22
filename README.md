@@ -42,7 +42,7 @@ result = svc.normalise_material("flint")
 #             preferred_label="Flint/Chert")
 ```
 
-### TypeScript: `@heritage/types`
+### TypeScript: `@mabo-du/heritage-types`
 
 > **Status: private, not published.** The `typescript/` directory contains
 > auto-generated TypeScript interfaces for web-based tools (StratiGraph,

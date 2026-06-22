@@ -9,7 +9,7 @@
 
 ## TL;DR
 
-The uncommitted changes add a useful **Provenance / PROV-O** layer + a required `SchemaVer` to the top-level `HeritageDataPackage`. The build (`make all`) runs cleanly and produces the regenerated artefacts. **However, shipping these changes as-is will silently break every downstream consumer of `heritage-models` and `@heritage/types`**, because:
+The uncommitted changes add a useful **Provenance / PROV-O** layer + a required `SchemaVer` to the top-level `HeritageDataPackage`. The build (`make all`) runs cleanly and produces the regenerated artefacts. **However, shipping these changes as-is will silently break every downstream consumer of `heritage-models` and `@mabo-du/heritage-types`**, because:
 1. The Python class for the new top-level model is renamed to `HeritageDataPackage1` (name collision with the root wrapper) — so `from heritage_models import HeritageDataPackage` returns a useless `RootModel[Any]`.
 2. The generated TypeScript references `uuid`, `datetime`, `SchemaVer`, `AgentType`, etc. as bare types that are never exported — the file won't compile.
 3. The change to `schemaVersion: string → SchemaVer` (REQUIRED) is a **breaking wire-format change** that AGENTS.md says **requires a major version bump + explicit notification of Mark**. No version was bumped, no CHANGELOG entry was added.
@@ -47,7 +47,7 @@ materialClass: MaterialClass;
 unitType: UnitType;
 ```
 **Cause:** `scripts/generate_typescript.py:generate_interfaces()` only emits `interface Foo` lines from `$defs` — it does **not** emit type aliases for scalars/enums. The author removed the `if name == "HeritageDataPackage": continue` branch, so the loop now emits nested-DuF `interface HeritageDataPackage` too, but still doesn't emit `type uuid = string; type datetime = string; type SchemaVer = \`${number}-${number}-${number}\`; enum AgentType {...}` etc.
-**Impact:** `tsc` will reject every `index.ts` import. Worse, `typescript/package.json` declares `"main": "src/index.ts"` and `"private": true` — but README advertises `npm install @heritage/types`. Either docs or code is wrong.
+**Impact:** `tsc` will reject every `index.ts` import. Worse, `typescript/package.json` declares `"main": "src/index.ts"` and `"private": true` — but README advertises `npm install @mabo-du/heritage-types`. Either docs or code is wrong.
 **Fix:** In `generate_typescript.py`, emit `type<alias>` lines for every scalar in `$defs` and every enum, then emit the interfaces. Alternatively switch to `json-schema-to-typescript` so this isn't hand-rolled.
 
 #### C3 — Unbumped version after a breaking wire-format change (AGENTS.md violation)
@@ -150,14 +150,14 @@ compile:
 **Fix:** Make the bundle identifier stable and respected. Either set `$id` in TypeSpec and drop `bundleId`, or always pass `bundleId=HeritageDataPackage` from the CLI and drop the override.
 
 #### M4 — TypeScript package is `private: true` but advertised as installable
-**File:** `typescript/package.json` (`"private": true`); `README.md` says `npm install @heritage/types`. No CI workflow publishes it. AGENTS.md says `StratiGraph npx npm install @heritage/types (not yet wired up)`.
+**File:** `typescript/package.json` (`"private": true`); `README.md` says `npm install @mabo-du/heritage-types`. No CI workflow publishes it. AGENTS.md says `StratiGraph npx npm install @mabo-du/heritage-types (not yet wired up)`.
 **Impact:** Documentation lies.
-**Fix:** Either remove the npm install mention, or remove `private: true` and add a publish-typescript workflow.
+**Fix:** Resolve by removing `private: true` from `typescript/package.json`, bumping the scope to `@mabo-du/heritage-types` (since the `@heritage` npm scope does not exist), and adding `.github/workflows/publish-typescript.yml`. See CHANGELOG 2.0.1.
 
 #### M5 — `scripts/generate_typescript.py` docstring promises AJV validators it does not emit
 **File:** `scripts/generate_typescript.py:1-9`
 ```python
-"""Generate the @heritage/types TypeScript package from canonical JSON Schema.
+"""Generate the @mabo-du/heritage-types TypeScript package from canonical JSON Schema.
 ...
 - TypeScript interfaces for each model
 - AJV-compatible JSON Schema validators
