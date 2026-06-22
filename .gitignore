@@ -17,3 +17,11 @@ https:/
 .claude/
 .ctx/
 typescript/package-lock.json
+
+# Charter / agent session artifacts
+.charter/
+*.charter-session
+.claude/local/
+.cursor/cache/
+.hk/
+.env

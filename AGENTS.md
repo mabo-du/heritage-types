@@ -51,7 +51,7 @@ make typescript # Regenerate TypeScript types from JSON Schema
 |---------|----------|--------------|-----------|
 | `heritage-models` | Python (Pydantic v2) | `pip install hoard` | `pip install heritage-models` |
 | `heritage-vocab` | Python | `pip install hoard` | `pip install heritage-models` |
-| `@mabo-du/heritage-types` | TypeScript | — | *(internal-only; vendor `typescript/src/index.ts` directly — see [RELEASE.md](RELEASE.md))* |
+| `@mabo-du/heritage-types` | TypeScript | `npm install` | `@mabo-du/heritage-types` *(workaround scope: `@heritage/` is unregistered on npmjs; will move to `@heritage/types` when scope lands. See [RELEASE.md](RELEASE.md) for migration plan)* |
 
 ---
 
@@ -80,7 +80,7 @@ This repo feeds into every tool in the HOARD ecosystem:
 | Tool | Uses | How |
 |------|------|-----|
 | **HOARD** | `heritage-models`, `heritage-vocab` | `pip install heritage-models` dep in pyproject.toml |
-| **StratiGraph** | `@mabo-du/heritage-types` *(vendored)* | Repository is **private**; StratiGraph vendors `typescript/src/index.ts` rather than installing from npm. See [RELEASE.md](RELEASE.md). |
+| **StratiGraph** | `@mabo-du/heritage-types` | v2.0.1 onwards: published to npm as `@mabo-du/heritage-types`. StratiGraph may continue to **vendor** `typescript/src/index.ts` OR `npm install @mabo-du/heritage-types`; both paths are first-class. See [coord/notify-typescript-npm.md](coord/notify-typescript-npm.md). |
 | **Trowel** | `heritage-models` | `pip install heritage-models` dep (optional, hoard group) |
 | **Libby** | `heritage-models` | For `Chronology` output type |
 
@@ -104,7 +104,7 @@ Any removal or rename of existing fields → bump major version AND notify Mark,
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 
-This project is indexed by GitNexus as **heritage-types** (326 symbols, 363 relationships, 7 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
+This project is indexed by GitNexus as **heritage-types** (579 symbols, 715 relationships, 17 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
 
 > Index stale? Run `node .gitnexus/run.cjs analyze` from the project root — it auto-selects an available runner. No `.gitnexus/run.cjs` yet? `npx gitnexus analyze` (npm 11 crash → `npm i -g gitnexus`; #1939).
 
@@ -144,3 +144,46 @@ This project is indexed by GitNexus as **heritage-types** (326 symbols, 363 rela
 | Index, status, clean, wiki CLI commands | `.claude/skills/gitnexus/gitnexus-cli/SKILL.md` |
 
 <!-- gitnexus:end -->
+
+---
+
+## Intentional overrides
+
+> **NOTE:** This section is **operator rationale**, not an inline charter
+> suppression. Charter `AE-SUPPRESS-001/002` recognise inline `<!--
+> charter:disable RULE: ... -->` pragmas, not this prose section; that
+> syntax is intentionally *not* embedded here so the rationale stays
+> auditable in one place. The findings below remain on the dashboard by
+> design, with reasoning that future operators can challenge. Each
+> override is operator-approved.
+
+### AE-CTX-001 -- AGENTS.md exceeds 600-token budget (~1905 tokens)
+
+**Status:** suppressed by operator intent.  
+**Reason:** AGENTS.md is the operator-handoff doc consumed by subagents
+and humans before any modification. Trimming to the 600-token "standard"
+budget would damage the safety guards in `## NEVER Do`, the ecosystem
+coordination table, the version-bump + RELEASE_NOTIFIED_MARK policy, the
+attribution canon (`Mark Bouck` only), the explicit-handle rules for
+`heritage_vocab` encryption, and the GitNexus Code Intelligence appendix.
+The append-only `## Intentional overrides` section itself hugs the
+budget, so trimming further would be lossy without compensating safety
+elsewhere.  
+**Approver:** Mark Bouck (solo maintainer).
+
+### AE-TEST-001 -- no automated tests detected for JavaScript/TypeScript
+
+**Status:** suppressed by operator intent.  
+**Reason:** TypeScript verification is performed at build time via
+`npm run verify` (which runs `tsc --noEmit` over `typescript/src/index.ts`)
+inside CI. Python verification is performed by
+`tests/test_models_codegen_health.py` and
+`tests/test_generate_typescript_idempotent.py`. Together these cover
+the round-trip from `spec/main.tsp` through `schemas/`,
+`python/heritage_models/models.py`, and `typescript/src/index.ts`.
+Adding Jest/Vitest on top would only re-test what `tsc --noEmit`
+already does and would introduce a new top-level dependency the project
+currently does not need (per the AGENTS.md "minimal surface area"
+philosophy).  
+**Approver:** Mark Bouck (solo maintainer).
+
