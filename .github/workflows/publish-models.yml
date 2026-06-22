@@ -198,7 +198,7 @@ jobs:
             WHEEL_NAME=$(basename "$WHEEL_PATH")
             LOCAL_HASH=$(sha256sum "$WHEEL_PATH" | awk '{print $1}')
             VERSION=$(echo "$WHEEL_NAME" | cut -d'-' -f2)
-            REMOTE_HASH=$(jq -r ".releases[\"${VERSION}\"][] | select(.filename == \"${WHEEL_NAME}\") | .digests.sha256 // empty" pypi_info.json)
+            REMOTE_HASH=$(jq -r ".releases[\"${VERSION}\"] // [] | .[] | select(.filename == \"${WHEEL_NAME}\") | .digests.sha256 // empty" pypi_info.json)
 
             if [[ -z "$REMOTE_HASH" ]]; then
               echo "==> heritage-models==${VERSION} (${WHEEL_NAME}) not yet on PyPI; will publish."
