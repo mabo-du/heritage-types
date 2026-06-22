@@ -120,7 +120,13 @@ jobs:
           python-version: "3.11"
 
       - name: Install codegen dependencies
-        run: uv pip install datamodel-code-generator
+        # Belt-and-braces pin against wheel-byte drift: SOURCE_DATE_EPOCH
+        # + the codegen header strip in _post_process_models handle
+        # *content* determinism; pinning the generator version here
+        # handles *generator* determinism (the index might otherwise
+        # resolve a newer micro-release that emits different bytes for
+        # the same input).
+        run: uv pip install datamodel-code-generator==0.65.0
 
       - name: Generate Pydantic models
         run: python scripts/generate_python.py
@@ -139,7 +145,17 @@ jobs:
       - name: Build distribution
         run: |
           cd python/heritage_models
-          uvx --from build pyproject-build --outdir dist/
+          # SOURCE_DATE_EPOCH is the PEP 517 reproducible-builds convention:
+          # # https://reproducible-builds.org/specs/source-date-epoch/
+          # Pinning it to the git commit epoch ensures the wheel's
+          # archive-mtime entries are identical across re-runs of the
+          # same commit, so the registry-idempotency gate's local-vs-
+          # remote SHA256 comparison can produce a stable skip=true path.
+          export SOURCE_DATE_EPOCH=$(git log -1 --format=%ct)
+          # Pin build package so the wheel-archive write path is
+          # byte-stable across re-runs. Mirror of the
+          # datamodel-code-generator pin in Install codegen dependencies.
+          uvx --from build==1.5.0 pyproject-build --outdir dist/
 
       - name: Check PyPI registry idempotency
         id: check_idemp
