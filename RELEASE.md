@@ -91,7 +91,7 @@ policy. Tagging without sending notifications costs you the explicit
 text acknowledgement in the dispatch UI; tagging a major bump
 without `RELEASE_NOTIFIED_MARK` fails the gate.
 
-## Authentication model
+## Authentication and secrets
 
 The publish workflows use different authentication paths per registry.
 Knowing which is which helps decode `gh run` failures when a publish

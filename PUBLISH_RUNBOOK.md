@@ -179,13 +179,13 @@ Drafts of the cross-repo coordination notifications live in
 
 * 2.0.0 breaking (`schemaVersion: string → SchemaVer (REQUIRED)`):
   * `coord/notify-hoard.md.archived-2.0.0` — filed as [HOARD #7](https://github.com/mabo-du/HOARD/issues/7); superseded by HOARD #8
-  * `coord/notify-stratigraph.md.archived-2.0.0` — filed as [StratiGraph #16](https://github.com/mabo-du/stratigraph/issues/16) (StratiGraph repo is private per `AGENTS.md`; 2.0.3+2.0.4 cycle uses direct-channel coord only)
+  * `coord/notify-stratigraph.md.archived-2.0.0` — filed as [StratiGraph #16](https://github.com/mabo-du/stratigraph/issues/16) (StratiGraph source repo is private per `AGENTS.md`; issue tracker is publicly accessible)
   * `coord/notify-trowel.md.archived-2.0.0` — filed as [Trowel #14](https://github.com/mabo-du/trowel/issues/14); superseded by Trowel #15
 
 * 2.0.3 + 2.0.4 non-breaking pipeline-hardening cycle:
   * `coord/notify-hoard.md` — filed as [HOARD #8](https://github.com/mabo-du/HOARD/issues/8)
   * `coord/notify-trowel.md` — filed as [Trowel #15](https://github.com/mabo-du/trowel/issues/15)
-  * `coord/notify-stratigraph.md` — direct-channel only (StratiGraph maintainer)
+  * `coord/notify-stratigraph.md` — filed as [StratiGraph #17](https://github.com/mabo-du/stratigraph/issues/17) (tracker accessible via GH API even though source is private)
 
 Each draft is intended to be opened as an issue (or PR comment) in
 the respective downstream repo's coordination channel. Operator-side
