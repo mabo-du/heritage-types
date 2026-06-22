@@ -1,10 +1,7 @@
 # Coordination: heritage-types → StratiGraph (2.0.0 breaking change)
 
-> **Status:** DRAFT — for the operator to file as an issue against
-> `/home/mark/Projects/StratiGraph` (or post as a comment on the
-> equivalent upstream repo). **DO NOT AUTO-POST** — the dispatch
-> publish of `heritage-types==2.0.0` is gated on confirmation these
-> notifications actually went out.
+> **Status:** SENT — filed as [stratigraph#16](https://github.com/mabo-du/stratigraph/issues/16)
+> on 2026-06-22. Heritage-types publish gate is satisfied.
 
 ## TL;DR
 

@@ -4,11 +4,17 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "heritage-vocab"
-version = "2.0.0"
+version = "2.0.1"
 description = "Offline Getty AAT/ULAN/TGN vocabulary service for archaeological term standardisation"
 requires-python = ">=3.11"
 license = { text = "MIT" }
 dependencies = []
+
+[tool.setuptools]
+packages = ["heritage_vocab"]
+
+[tool.setuptools.package-dir]
+"heritage_vocab" = "."
 
 [project.optional-dependencies]
 dev = ["pytest>=8"]
