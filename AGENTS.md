@@ -83,7 +83,7 @@ This repo feeds into every tool in the HOARD ecosystem:
 | **StratiGraph** | `@mabo-du/heritage-types` | v2.0.1 onwards: published to npm as `@mabo-du/heritage-types`. StratiGraph may continue to **vendor** `typescript/src/index.ts` OR `npm install @mabo-du/heritage-types`; both paths are first-class. See [coord/notify-typescript-npm.md](coord/notify-typescript-npm.md). |
 | **Trowel** | `heritage-models` | `pip install heritage-models` dep (optional, hoard group) |
 | **Libby** | `heritage-models` | For `Chronology` output type |
-| **heritage-cli** | *(independent CLI UX; no `heritage-models` or `heritage-vocab` dependency)* | `pip install heritage-cli` unified ecosystem CLI; complements the heritage-models + heritage-vocab ecosystem without depending on them |
+| **heritage-cli** | *(independent CLI UX; no `heritage-models` or `heritage-vocab` dependency)* | `pip install heritage-cli` unified ecosystem CLI; does **not** depend on `heritage-models` or `heritage-vocab` |
 
 ---
 

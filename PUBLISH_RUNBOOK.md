@@ -26,7 +26,7 @@ Before running anything, confirm:
 
 If any item is wrong, STOP and resolve before continuing.
 
-## Authentication & secrets
+## Authentication and secrets
 
 Publishing routes through three identifiers. Knowing which one is in play
 decodes `gh run` failures when a publish succeeds locally but fails in
@@ -226,7 +226,7 @@ gh workflow run publish-models.yml \
 
 `secrets.NPM_TOKEN` is the operator-managed GitHub Secret consumed by
 `publish-typescript.yml` to authenticate to npmjs.com. The PyPI workflows
-do NOT use this secret (they use OIDC; see [Authentication & secrets](#authentication--secrets)).
+do NOT use this secret (they use OIDC; see [Authentication and secrets](#authentication-and-secrets)).
 
 Rotate on a routine cadence **and** after any suspected exposure:
 
