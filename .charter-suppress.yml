@@ -1,0 +1,12 @@
+suppressions:
+    - rule: AE-NONEXISTENT-999
+      reason: test only
+      expires: "2026-09-20"
+    - rule: AE-CTX-001
+      reason: 'AGENTS.md is intentionally oversized (~2790 tokens via cl100k_base; ~4.6x the 600-token charter standard). Per-row inline pragmas document per-rule rationale. Prose ## Intentional overrides captures full operator rationale. Trimming would damage the load-bearing safety guards in NEVER Do, the cross-repo coordination table, the attribution canon (Mark Bouck only), the version-bump + RELEASE_NOTIFIED_MARK policy, the heritage_vocab encryption-param rules, and the GitNexus MCP code-intelligence appendix.'
+      expires: permanent
+      approver: Mark Bouck
+    - rule: AE-TEST-001
+      reason: TypeScript verification is performed at build time via tsc --noEmit over typescript/src/index.ts (Makefile make test step + CI). Python verification is performed by tests/test_models_codegen_health.py, tests/test_generate_typescript_idempotent.py, tests/test_gate_verifier.py, tests/test_heritage_models.py, tests/test_heritage_vocab.py. Together these cover the round-trip from spec/main.tsp through schemas/, python/heritage_models/models.py, and typescript/src/index.ts. Adding Jest/Vitest would only re-test what tsc --noEmit already does and would introduce a top-level dependency the project avoids per AGENTS.md minimal surface area philosophy.
+      expires: permanent
+      approver: Mark Bouck

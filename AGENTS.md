@@ -88,10 +88,20 @@ This repo feeds into every tool in the HOARD ecosystem:
 
 ## NEVER Do
 
+<!-- charter:disable AE-CTX-001 reason="NEVER: hand-edit-generated safety guard - spec/main.tsp is the single source of truth; make all regenerates from it" approver="Mark Bouck" -->
+
 - **Never hand-edit generated files** in `schemas/`, `python/heritage_models/`, or `typescript/` — edit `spec/main.tsp` and run `make all`
+<!-- charter:disable AE-CTX-001 reason="NEVER: cross-repo coordination guard - HOARD/StratiGraph/Trowel/Libby are the consumers; new repos need Mark approval" approver="Mark Bouck" -->
+
 - **Never create a new GitHub repository** without asking Mark first
+<!-- charter:disable AE-CTX-001 reason="NEVER: heritage_vocab encryption-param stability guard - must remain compatible with Cache and Carry SQLite schema" approver="Mark Bouck" -->
+
 - **Never change the encryption parameters in `heritage_vocab`** — the service must stay compatible with Cache & Carry's SQLite schema
+<!-- charter:disable AE-CTX-001 reason="NEVER: cross-tool major-version migration guard - HOARD, StratiGraph and Trowel all depend on these types so removal/rename forces coordinated bump" approver="Mark Bouck" -->
+
 - **Never break backwards compatibility** in existing model fields without bumping the major version — HOARD, StratiGraph, and Trowel all depend on these types
+<!-- charter:disable AE-CTX-001 reason="NEVER: filesystem-corruption guard - concurrent GPU training and CPU-heavy workload risks irrecoverable fs damage on Mark's machine" approver="Mark Bouck" -->
+
 - **Never run GPU training and CPU-heavy tasks simultaneously** on Mark's machine — filesystem corruption risk
 
 ---
@@ -118,9 +128,17 @@ This project is indexed by GitNexus as **heritage-types** (579 symbols, 715 rela
 
 ## Never Do
 
+<!-- charter:disable AE-CTX-001 reason="gitnexus MCP code-intelligence rule (GitNexus auto-generated appendix; not project-AGENTS.md override scope)" approver="Mark Bouck" -->
+
 - NEVER edit a function, class, or method without first running `impact` on it.
+<!-- charter:disable AE-CTX-001 reason="gitnexus MCP code-intelligence rule (GitNexus auto-generated appendix; not project-AGENTS.md override scope)" approver="Mark Bouck" -->
+
 - NEVER ignore HIGH or CRITICAL risk warnings from impact analysis.
+<!-- charter:disable AE-CTX-001 reason="gitnexus MCP code-intelligence rule (GitNexus auto-generated appendix; not project-AGENTS.md override scope)" approver="Mark Bouck" -->
+
 - NEVER rename symbols with find-and-replace — use `rename` which understands the call graph.
+<!-- charter:disable AE-CTX-001 reason="gitnexus MCP code-intelligence rule (GitNexus auto-generated appendix; not project-AGENTS.md override scope)" approver="Mark Bouck" -->
+
 - NEVER commit changes without running `detect_changes()` to check affected scope.
 
 ## Resources
