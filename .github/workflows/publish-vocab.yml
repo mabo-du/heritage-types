@@ -73,9 +73,21 @@ jobs:
 
       - name: Run tests
         run: |
-          pip install pytest
-          pip install -e python/heritage_vocab
+          uv pip install pytest
+          uv pip install -e python/heritage_vocab
           python -m pytest tests/test_heritage_vocab.py -v
+
+      - name: Validate tag_to_publish matches pyproject.toml version
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          set -euo pipefail
+          TAG_VERSION="${{ github.event.inputs.tag_to_publish }}"
+          TAG_VERSION="${TAG_VERSION#vocab-v}"
+          PYPROJ_VERSION="$(python -c "import tomllib; print(tomllib.load(open('python/heritage_vocab/pyproject.toml','rb'))['project']['version'])")"
+          if [[ "$TAG_VERSION" != "$PYPROJ_VERSION" ]]; then
+            echo "::error::tag_to_publish version ($TAG_VERSION) does not match pyproject.toml version ($PYPROJ_VERSION)"
+            exit 1
+          fi
 
       - name: Build distribution
         run: |
