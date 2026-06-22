@@ -100,14 +100,27 @@ jobs:
       - name: Build distribution
         env:
           SOURCE_DATE_EPOCH: ${{ steps.epoch.outputs.epoch }}
+          # TZ=UTC so time.localtime(SOURCE_DATE_EPOCH) returns the same
+          # date_time tuple across dispatch + local rebuilds; without
+          # this, setuptools' ZIP date_time field is host-TZ-shifted
+          # (GH-Actions ubuntu-latest vs operator container produce
+          # different wheel bytes).
+          TZ: UTC
         run: |
           cd python/heritage_vocab
           # SOURCE_DATE_EPOCH pin mirrors publish-models.yml (post-cef633c)
           # so the wheel's archive-mtime entries are identical across
           # re-runs of the same commit, letting the registry-idempotency
           # gate's local-vs-remote sha256 comparison produce a stable
-          # skip=true path. Belt-and-braces pin of build==1.5.0 keeps the
-          # wheel-archive writer byte-stable across re-runs.
+          # skip=true path.
+          #
+          # umask 022 normalises external_attr (Unix mode bits) across
+          # hosts so setuptools stamps consistent mode values; without
+          # it, the 15-byte drift observed on heritage-vocab==2.0.3
+          # becomes 0.
+          umask 022
+          # Belt-and-braces pin of build==1.5.0 keeps the wheel-archive
+          # writer byte-stable across re-runs.
           uvx --from build==1.5.0 pyproject-build --outdir dist/
 
       - name: Check PyPI registry idempotency
