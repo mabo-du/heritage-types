@@ -97,12 +97,14 @@ jobs:
         run: |
           cd typescript
           npm install
-          # Use `npm exec --no --package=typescript tsc` because npm hoists
-          # typescript to the repo-root node_modules/ (when `npm ci` already
-          # created one), so `./node_modules/.bin/tsc` does not exist.
-          # `--no` prevents fetching from the registry (the real `tsc` is in
-          # the `typescript` package, not the deprecated `tsc` package).
-          npm exec --no --package=typescript -- tsc --noEmit -p .
+          # Use `npm run verify` (defined in package.json scripts) so npm's
+          # own node-resolve handles the tsc binary path-walking. This is
+          # hoisting-safe: npm finds `tsc` whether it's in
+          # typescript/node_modules/ or hoisted to repo-root node_modules/.
+          # Previously tried `./node_modules/.bin/tsc` (failed because the
+          # binary is hoisted to root) and `npm exec --package=typescript`
+          # (failed because npm exec didn't walk up to root).
+          npm run verify
 
       - name: Build dist for npm
         run: |
