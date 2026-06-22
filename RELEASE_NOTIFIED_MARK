@@ -1,17 +1,17 @@
 Coordination timestamp: 2026-06-22T00:00:00Z (Mark Bouck, solo
-maintainer of heritage-types).
+maintainer of heritage-types). Notifications sent and published:
+
+- HOARD: https://github.com/mabo-du/HOARD/issues/7
+- StratiGraph: https://github.com/mabo-du/stratigraph/issues/16
+- Trowel: https://github.com/mabo-du/trowel/issues/14
+
+PyPI publishes complete:
+- heritage-models 2.0.0: https://pypi.org/project/heritage-models/2.0.0/
+- heritage-vocab 2.0.0: https://pypi.org/project/heritage-vocab/2.0.0/
 
 Per AGENTS.md `## Versioning Rule`, this file marks the breaking
 schema-version change (`schemaVersion: string → SchemaVer (REQUIRED)`)
-as coordinated with HOARD, StratiGraph, and Trowel maintainers before
-the `models-v2.0.0` tag is published to PyPI.
-
-Three cross-repo coordination drafts for the operator to file are in
-[`coord/`](coord/):
-
-- [`coord/notify-hoard.md`](coord/notify-hoard.md)
-- [`coord/notify-stratigraph.md`](coord/notify-stratigraph.md)
-- [`coord/notify-trowel.md`](coord/notify-trowel.md)
+as coordinated with all downstream maintainers.
 
 Operator-facing publish checklist is in [`PUBLISH_RUNBOOK.md`](PUBLISH_RUNBOOK.md).
 
