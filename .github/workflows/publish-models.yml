@@ -187,6 +187,7 @@ jobs:
             exit 0
           fi
 
+          # See PUBLISH_RUNBOOK.md § "Gate C — PyPI registry idempotency" for the // [] | .[] rationale.
           # Iterate every wheel — require ALL to match before emitting
           # skip=true. A multi-wheel release (py3-none-any + abi X) cannot
           # be considered "already published" until every binary matches,
