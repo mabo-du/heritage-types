@@ -1,5 +1,60 @@
 # Changelog
 
+## [2.0.3] — 2026-06-22
+
+### Fixed
+
+- **PyPI publish pipeline hardened for byte-stable, idempotent re-runs.**
+  `publish-models.yml` and `publish-vocab.yml` Build distribution step
+  now pins the full reproducibility contract that the post-`cef633c`
+  `publish-models.yml` commit had partially set up:
+  - `env: SOURCE_DATE_EPOCH: ${{ steps.epoch.outputs.epoch }}` (on
+    `publish-vocab.yml` for parity with `publish-models.yml`) so
+    wheel ZIP mtime is git-committer-time, i.e. commit-deterministic.
+  - `env: TZ: UTC` makes `time.localtime(SOURCE_DATE_EPOCH)`
+    reproducible across dispatch and local-rebuild environments.
+    Without this, `time.localtime()` returns a host-TZ-dependent
+    `struct_time`, so ZIP entry mtimes drift by the host's UTC
+    offset — a 38-minute drift was observed across a fresh
+    dispatch.
+  - `umask 022` in the run block normalises `ZipInfo.external_attr`
+    high-half (which encodes `unix_mode`), so file-permission bits
+    no longer drift by host umask.
+  - `uvx --from build==1.5.0` is pinned on both Python workflows
+    so the wheel archive writer is version-stable.
+- **PyPI registry-idempotency gate** is now in place on
+  `publish-vocab.yml` (the control flow was on `publish-models.yml`
+  already). A "Check PyPI registry idempotency" step compares the
+  rebuilt wheel's `sha256` against PyPI's per-version published
+  `sha256`; the "Publish to PyPI" step exits via `skip=true`
+  (`conclusion = success`, no overwrite) when bytes match, and
+  fails with `##[error]Aborting publish to prevent silent
+  corruption` when bytes drift. This prevents byte-corrupting an
+  immutable PyPI release by environment-drift between CI re-runs.
+- **`publish-typescript.yml` SOURCE_DATE_EPOCH propagation** mirrors
+  the Python workflows. A "Derive commit epoch" step exposes
+  git-committer-time as `steps.epoch.outputs.epoch`; `SOURCE_DATE_EPOCH`
+  is bound on BOTH the Build step AND the "Check npm registry
+  idempotency" step (GH Actions `env:` is step-scoped, so both
+  bindings are required for `npm pack`'s tar-entry mtime stamping
+  to be reproducible across re-runs).
+
+### Notes
+
+- `2.0.2 → 2.0.3` is a non-breaking patch-level release: no
+  schema, model, or public Python/TypeScript API surface changes.
+  Consumer pins (`heritage-models==2.0.x`, `heritage-vocab==2.0.x`,
+  `@heritage/types` vendoring) do not need to change. Pure CI-side
+  hardening.
+- Locally-reproduced `2.0.3` wheels are byte-identical across
+  re-runs at the same commit (rebuild → rebuild = same `sha256`).
+  The 24-byte archival delta vs the `2.0.3` wheels currently on
+  PyPI is **intentional**: those wheels were built before this
+  hardening's `TZ: UTC` binding landed, so the gating correctly
+  refuses to overwrite them. Bit-exact closure at PyPI will happen
+  at the next version-bump that is built by this hardened pipeline
+  against a GREEN PyPI registry.
+
 ## [2.0.2] — 2026-06-22
 
 ### Fixed
