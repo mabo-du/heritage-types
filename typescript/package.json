@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
-    "verify": "tsc --noEmit -p tsconfig.json"
+    "verify": "tsc -p tsconfig.json"
   },
   "devDependencies": {
     "typescript": "^5.7"
