@@ -12,8 +12,6 @@ consumer action is required** for HOARD.
 - `heritage-models==2.0.3, 2.0.4` \u2014 pure CI-side hardening, no schema or
   model surface changes versus 2.0.2 / 2.0.0.
 - `heritage-vocab==2.0.3, 2.0.4` \u2014 same.
-- `@mabo-du/heritage-types==2.0.3, 2.0.4` \u2014 same (vendor path or
-  `npm install` path; both are first-class per AGENTS.md).
 
 ## What changed in `heritage-models` between 2.0.2 and 2.0.4
 

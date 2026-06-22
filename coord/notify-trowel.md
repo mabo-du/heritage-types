@@ -12,10 +12,6 @@ patch-level releases since the coordinated 2.0.0 cycle.
 - `heritage-models==2.0.3, 2.0.4` \u2014 pure CI-side hardening, no schema or
   model surface changes versus 2.0.2 / 2.0.0.
 - `heritage-vocab==2.0.3, 2.0.4` \u2014 same.
-- `@mabo-du/heridge-types==2.0.3, 2.0.4` \u2014 same (Trowel is Python
-  + Pydantic v2 per `heritage-types/AGENTS.md ## Ecosystem Context`,
-  so the npm package is not on the critical path; vendor or
-  `pip install` work unchanged).
 
 ## What changed in `heritage-models` between 2.0.2 and 2.0.4
 
