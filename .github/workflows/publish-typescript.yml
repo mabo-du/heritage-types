@@ -115,13 +115,13 @@ jobs:
       - name: Build dist for npm
         env:
           SOURCE_DATE_EPOCH: ${{ steps.epoch.outputs.epoch }}
+          # TZ=UTC mirrors publish-models.yml discipline for cross-host
+          # reproducibility in any tooling that uses localtime.
+          TZ: UTC
         run: |
           cd typescript
-          # SOURCE_DATE_EPOCH propagates through `npm run build` so the
-          # downstream `npm pack` in Check npm registry idempotency
-          # produces a tarball whose entry mtimes are pinned to the
-          # commit epoch — matches publish-models.yml / publish-vocab.yml
-          # post-cef633c discipline.
+          # umask 022: host-stable file modes.
+          umask 022
           npm run build
 
       # Idempotency gate: re-pushing the same tag should turn the workflow
@@ -136,6 +136,9 @@ jobs:
         id: check_idemp
         env:
           SOURCE_DATE_EPOCH: ${{ steps.epoch.outputs.epoch }}
+          # TZ=UTC mirrors publish-models.yml discipline for cross-host
+          # reproducibility in any tooling that uses localtime.
+          TZ: UTC
         run: |
           set -euo pipefail
           cd typescript
