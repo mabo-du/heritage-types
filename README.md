@@ -55,10 +55,6 @@ result = svc.normalise_material("flint")
 
 Canonical JSON Schema files in `schemas/` — language-agnostic, usable from any programming environment for data validation.
 
-### JSON Schema
-
-Canonical JSON Schema files in `schemas/` — language-agnostic, usable from any programming environment for data validation.
-
 ## Source of Truth
 
 All models are defined in TypeSpec (`spec/main.tsp`) and compiled to JSON Schema Draft 2020-12. Python and TypeScript packages are auto-generated from the compiled schemas.

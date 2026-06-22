@@ -11,3 +11,7 @@ https:/
 
 # Cache & Carry's vocabulary DB when cached locally for dev.
 *.vocab_cache.db
+
+# Local dev artifacts — GitNexus index and Claude skill configs.
+.claude/
+.ctx/

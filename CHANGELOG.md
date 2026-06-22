@@ -58,7 +58,21 @@
     fallback (not Cache & Carry) and the URIs have been **flagged as
     unverified**.
 - `.gitignore`: added `https:/` (artefacts from the TypeSpec emitter
-  treating `bundleId` as a relative URL) and `*.vocab_cache.db`.
+  treating `bundleId` as a relative URL), `*.vocab_cache.db`,
+  `.claude/`, and `.ctx/` (local dev artifacts).
+- `tspconfig.yaml`: `bundleId` now `"HeritageDataPackage"` — consistent
+  with Makefile/CI overrides, eliminating the `https:/` artifact directory
+  when `tsp compile` is run directly.
+- `Makefile clean`: removed dead `rm -rf typescript/dist/` (the TypeScript
+  target never produces a `dist/` directory).
+- `package.json`: pinned `@typespec/compiler` and `@typespec/json-schema`
+  from `"latest"` to `"^1.12"`; lockfile refreshed.
+- `normalise_period` now applies the same `_label_similar` guard as
+  `normalise_material` to non-exact FTS5 results, rejecting false prefix
+  matches (e.g. searching "sto" matching "flint stone" via FTS5).
+- Tests: added `_label_similar` guard regression tests for both
+  `normalise_period` (happy path, false prefix match rejection, unknown
+  term) and `normalise_material` (same three scenarios). Total: 76 tests.
 
 ### Removed
 

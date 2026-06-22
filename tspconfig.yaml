@@ -3,5 +3,5 @@ emit:
 options:
   "@typespec/json-schema":
     file-type: json
-    bundleId: "https://schemas.heritage-science.dev/HeritageDataPackage"
+    bundleId: "HeritageDataPackage"
     emitter-output-dir: "{project-root}/schemas"

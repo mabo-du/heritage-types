@@ -179,3 +179,95 @@ def test_fallback_lookup_returns_none_when_no_db() -> None:
 
 def test_fallback_source_tag_constant_is_meaningful() -> None:
     assert "unverified" in FALLBACK_SOURCE_TAG
+
+
+# ── Normalisation: _label_similar guard (M13 fix) ───────────────────────
+# ``normalise_period`` and ``normalise_material`` must both apply
+# ``_label_similar`` to non-exact FTS5 results so a false prefix match
+# (e.g. searching "sto" matching "flint stone" via FTS5) doesn't leak
+# an unrelated term as the normalised output.
+
+
+def test_normalise_period_happy_path() -> None:
+    """A known period term in the sample DB normalises correctly."""
+    with tempfile.TemporaryDirectory() as d:
+        path = Path(d) / "vocab.db"
+        svc = VocabularyService(db_path=path, auto_create=True)
+        result = svc.normalise_period("bronze age")
+        assert result is not None
+        assert result.preferred_label == "Bronze Age"
+        assert result.source == "aat"
+
+
+def test_normalise_period_rejects_false_prefix_match() -> None:
+    """A term whose only FTS5 hit is unrelated must be rejected by
+    the ``_label_similar`` guard, not returned as a normalised result.
+
+    ``_create_sample_db`` seeds "Flint/Chert" with alt_label "flint
+    stone". FTS5 prefix search ``"sto"*`` matches the token "stone"
+    and returns the Flint/Chert row — but ``_label_similar("sto",
+    "flint/chert")`` is False, so ``normalise_period`` must return
+    None.
+    """
+    with tempfile.TemporaryDirectory() as d:
+        path = Path(d) / "vocab.db"
+        svc = VocabularyService(db_path=path, auto_create=True)
+        result = svc.normalise_period("sto")
+        assert result is None, (
+            f"guard failed: normalise_period('sto') returned "
+            f"{result.preferred_label!r} — _label_similar should have "
+            f"blocked the unrelated FTS5 prefix match"
+        )
+
+
+def test_normalise_period_unknown_term_returns_none() -> None:
+    """A term with no sample-DB or fallback match returns None."""
+    with tempfile.TemporaryDirectory() as d:
+        path = Path(d) / "vocab.db"
+        svc = VocabularyService(db_path=path, auto_create=True)
+        result = svc.normalise_period("qzqzqz_unknown_period")
+        assert result is None
+
+
+# ── Normalisation: _label_similar guard — materials ────────────────────
+
+
+def test_normalise_material_happy_path() -> None:
+    """A known material term in the sample DB normalises correctly."""
+    with tempfile.TemporaryDirectory() as d:
+        path = Path(d) / "vocab.db"
+        svc = VocabularyService(db_path=path, auto_create=True)
+        result = svc.normalise_material("flint")
+        assert result is not None
+        assert result.preferred_label == "Flint/Chert"
+        assert result.source == "aat"
+
+
+def test_normalise_material_rejects_false_prefix_match() -> None:
+    """A term whose only FTS5 hit is unrelated must be rejected by
+    the ``_label_similar`` guard, not returned as a normalised result.
+
+    ``_create_sample_db`` seeds "Flint/Chert" with alt_label "flint
+    stone". FTS5 prefix search ``"ston"*`` matches the token "stone"
+    and returns the Flint/Chert row — but ``_label_similar("ston",
+    "flint/chert")`` is False, so ``normalise_material`` must return
+    None.
+    """
+    with tempfile.TemporaryDirectory() as d:
+        path = Path(d) / "vocab.db"
+        svc = VocabularyService(db_path=path, auto_create=True)
+        result = svc.normalise_material("ston")
+        assert result is None, (
+            f"guard failed: normalise_material('ston') returned "
+            f"{result.preferred_label!r} — _label_similar should have "
+            f"blocked the unrelated FTS5 prefix match"
+        )
+
+
+def test_normalise_material_unknown_term_returns_none() -> None:
+    """A term with no sample-DB or fallback match returns None."""
+    with tempfile.TemporaryDirectory() as d:
+        path = Path(d) / "vocab.db"
+        svc = VocabularyService(db_path=path, auto_create=True)
+        result = svc.normalise_material("qzqzqz_unknown_material")
+        assert result is None

@@ -11,8 +11,8 @@
     "clean": "rm -rf schemas/*.json dist/"
   },
   "devDependencies": {
-    "@typespec/compiler": "latest",
-    "@typespec/json-schema": "latest"
+    "@typespec/compiler": "^1.12",
+    "@typespec/json-schema": "^1.12"
   },
   "private": true
 }

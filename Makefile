@@ -37,7 +37,6 @@ clean:
 	rm -f  schemas/heritage-data-package-v*.json
 	rm -f  schemas/HeritageDataPackage
 	rm -rf python/heritage_models/__pycache__
-	rm -rf typescript/dist/
 	rm -rf .pytest_cache tests/__pycache__ tests/*/__pycache__
 	rm -rf tests/.mypy_cache
 

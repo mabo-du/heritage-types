@@ -195,7 +195,9 @@ class VocabularyService:
             if results:
                 return results[0]
             results = self.search(t, vocabulary="aat", limit=1)
-            if results:
+            if results and self._label_similar(
+                raw_term, results[0].preferred_label.lower()
+            ):
                 return results[0]
         return None
 

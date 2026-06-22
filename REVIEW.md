@@ -2,7 +2,8 @@
 
 **Scope:** bugs, missing features, empty stubs, hardcoded data, mock data, security issues.
 **Date of review:** 22 June 2026
-**Reviewed against:** working tree on `main` (uncommitted changes to `spec/main.tsp`, regenerated `schemas/`, `python/heritage_models/models.py`, `typescript/src/index.ts`, `scripts/generate_typescript.py`).
+**Second pass:** 22 June 2026 — the remaining M3, M6, M13, and L5 issues resolved; tests added.
+**Reviewed against:** working tree on `main`.
 
 ---
 
@@ -267,10 +268,30 @@ A third small thing: the `AGENTS.md` references `GitNexus` MCP tools extensively
 
 ## Suggested immediate actions (priority order)
 
-1. **Do not tag or publish** the current diff. Resolve C1 + C2 + C3 first.
-2. Re-run codegen after the changes below; commit only when `python/heritage_models/models.py` has *no* `HeritageDataPackage1` class, and `tsc --noEmit typescript/src/index.ts` passes.
-3. Fix C1: drop `--class-name HeritageDataPackage` from `generate_python.py`.
-4. Fix C2: extend `generate_typescript.py` to emit `type uuid = string` etc. for scalars and `enum AgentType {...}` for enums.
-5. Fix C3: bump to `2.0.0` everywhere, add CHANGELOG entry.
-6. Add a CI workflow step that runs `pytest` (after writing tests) and `tsc --noEmit`.
-7. Address H1, H3, H4 in a follow-up commit.
+1. ~~Do not tag or publish the current diff. Resolve C1 + C2 + C3 first.~~ ✅
+2. ~~Re-run codegen after the changes below; commit only when `python/heritage_models/models.py` has *no* `HeritageDataPackage1` class, and `tsc --noEmit typescript/src/index.ts` passes.~~ ✅
+3. ~~Fix C1: drop `--class-name HeritageDataPackage` from `generate_python.py`.~~ ✅
+4. ~~Fix C2: extend `generate_typescript.py` to emit `type uuid = string` etc. for scalars and `enum AgentType {...}` for enums.~~ ✅
+5. ~~Fix C3: bump to `2.0.0` everywhere, add CHANGELOG entry.~~ ✅
+6. ~~Add a CI workflow step that runs `pytest` (after writing tests) and `tsc --noEmit`.~~ ✅
+7. ~~Address H1, H3, H4 in a follow-up commit.~~ ✅
+
+---
+
+## Second pass (2026-06-22) — remaining REVIEW.md issues resolved
+
+The following issues flagged in the original review have been addressed:
+
+| Issue | Description | Resolution |
+|-------|-------------|------------|
+| **M3** | `bundleId` mismatch between `tspconfig.yaml` and build invocations | `tspconfig.yaml` now uses `bundleId: "HeritageDataPackage"` consistently with Makefile/CI |
+| **M6** | `make clean` removes non-existent `typescript/dist/` | Dead `rm -rf typescript/dist/` line removed from Makefile `clean` target |
+| **M13** | `normalise_period` missing `_label_similar` guard | `_label_similar` guard added; now matches `normalise_material` defensive behaviour |
+| **L5** | `package.json` uses `"latest"` for devDependencies | Pinned `@typespec/compiler` and `@typespec/json-schema` to `"^1.12"`; lockfile refreshed |
+| **—** | `.claude/` and `.ctx/` directories untracked | Added to `.gitignore` to prevent accidental commits of local dev artifacts |
+
+### New tests added
+
+- 3 `normalise_period` regression tests: happy path, false prefix match rejection (`_label_similar` guard), unknown term → None
+- 3 `normalise_material` regression tests: happy path, false prefix match rejection (`_label_similar` guard), unknown term → None
+- **Total test suite:** 76 tests, all passing. `tsc --noEmit` clean.
