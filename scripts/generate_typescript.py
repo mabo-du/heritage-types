@@ -179,15 +179,17 @@ def main() -> None:
         version = "2.0.0"
         description = "Auto-generated TypeScript types from heritage-types canonical schemas"
 
-    pkg = {
-        "name": "@heritage/types",
-        "version": version,
-        "description": description,
-        "main": "src/index.ts",
-        "types": "src/index.ts",
-        "private": True,
-    }
-    (OUTPUT_DIR.parent / "package.json").write_text(json.dumps(pkg, indent=2))
+    # Patch existing typescript/package.json instead of overwriting it.
+    # The published npm package lives under @mabo-du/heritage-types
+    # (the @heritage scope does not exist on npmjs). Regeneration only
+    # updates `version` and `description` here; everything else
+    # (name, scripts.verify, scripts.build, publishConfig, devDeps,
+    # repository) is committed by humans and must survive runs.
+    ts_pkg_path = OUTPUT_DIR.parent / "package.json"
+    ts_pkg = json.loads(ts_pkg_path.read_text(encoding="utf-8"))
+    ts_pkg["version"] = version
+    ts_pkg["description"] = description
+    ts_pkg_path.write_text(json.dumps(ts_pkg, indent=2) + "\n", encoding="utf-8")
 
     print(f"✓ Generated: {OUTPUT_DIR / 'index.ts'}")
     print(f"  Lines: {len(output.splitlines())}")
