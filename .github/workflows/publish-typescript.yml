@@ -106,7 +106,46 @@ jobs:
           cd typescript
           npm run build
 
+      # Idempotency gate: re-pushing the same tag should turn the workflow
+      # green, not red. We compute the local tarball shasum and compare it
+      # to the equivalent field on the published npm version metadata.
+      # Three outcomes:
+      #   * version absent on registry → publish step runs (skip unset)
+      #   * version present + shasums match → publish step is skipped
+      #   * version present + shasums differ → :error: and exit 1 (avoids
+      #     silently overwriting a drifted prior build)
+      - name: Check npm registry idempotency
+        id: check_idemp
+        run: |
+          set -euo pipefail
+          cd typescript
+          PKG_NAME=$(node -p "require('./package.json').name")
+          VERSION=$(node -p "require('./package.json').version")
+          LOCAL_TARBALL=$(npm pack --quiet)
+          LOCAL_SHASUM=$(shasum -a 1 "$LOCAL_TARBALL" | awk '{print $1}')
+          rm "$LOCAL_TARBALL"
+
+          HTTP_STATUS=$(curl -s -o npm_info.json -w "%{http_code}" \
+            "https://registry.npmjs.org/${PKG_NAME}/${VERSION}")
+
+          if [[ "$HTTP_STATUS" == "200" ]]; then
+            REMOTE_SHASUM=$(jq -r '.dist.shasum // empty' npm_info.json)
+            rm -f npm_info.json
+            if [[ "$REMOTE_SHASUM" == "$LOCAL_SHASUM" ]]; then
+              echo "==> ${PKG_NAME}@${VERSION} already on npm with matching shasum; skipping publish (idempotent re-run path)."
+              echo "skip=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "::error::${PKG_NAME}@${VERSION} already exists on npm but local shasum (${LOCAL_SHASUM}) differs from remote (${REMOTE_SHASUM})."
+              echo "::error::Aborting publish to prevent silent corruption of an existing release."
+              exit 1
+            fi
+          else
+            rm -f npm_info.json
+            echo "==> ${PKG_NAME}@${VERSION} not yet on npm; proceeding with publish."
+          fi
+
       - name: Publish to npm
+        if: steps.check_idemp.outputs.skip != 'true'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |

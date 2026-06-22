@@ -141,7 +141,64 @@ jobs:
           cd python/heritage_models
           uvx --from build pyproject-build --outdir dist/
 
+      - name: Check PyPI registry idempotency
+        id: check_idemp
+        run: |
+          set -euo pipefail
+          cd python/heritage_models/dist
+          shopt -s nullglob
+          WHEEL_FILES=(*.whl)
+          if (( ${#WHEEL_FILES[@]} < 1 )); then
+            echo '::error::No wheel built in python/heritage_models/dist/'
+            exit 1
+          fi
+
+          HTTP_STATUS=$(curl -s -o pypi_info.json -w "%{http_code}" \
+            "https://pypi.org/pypi/heritage-models/json")
+          if [[ "$HTTP_STATUS" != "200" ]]; then
+            echo "==> heritage-models not yet on PyPI (HTTP ${HTTP_STATUS}); proceeding with publish."
+            rm -f pypi_info.json
+            exit 0
+          fi
+
+          # Iterate every wheel — require ALL to match before emitting
+          # skip=true. A multi-wheel release (py3-none-any + abi X) cannot
+          # be considered "already published" until every binary matches,
+          # otherwise the publish step would re-upload the unmatched one
+          # and the workflow would half-success on the next re-run.
+          ALL_MATCH=true
+          ANY_CONFLICT=false
+          for WHEEL_PATH in "${WHEEL_FILES[@]}"; do
+            WHEEL_NAME=$(basename "$WHEEL_PATH")
+            LOCAL_HASH=$(sha256sum "$WHEEL_PATH" | awk '{print $1}')
+            VERSION=$(echo "$WHEEL_NAME" | cut -d'-' -f2)
+            REMOTE_HASH=$(jq -r ".releases[\"${VERSION}\"][] | select(.filename == \"${WHEEL_NAME}\") | .digests.sha256 // empty" pypi_info.json)
+
+            if [[ -z "$REMOTE_HASH" ]]; then
+              echo "==> heritage-models==${VERSION} (${WHEEL_NAME}) not yet on PyPI; will publish."
+              ALL_MATCH=false
+            elif [[ "$REMOTE_HASH" != "$LOCAL_HASH" ]]; then
+              echo "::error::heritage-models==${VERSION} (${WHEEL_NAME}) exists on PyPI but local sha256 (${LOCAL_HASH}) differs from remote (${REMOTE_HASH})."
+              ANY_CONFLICT=true
+              ALL_MATCH=false
+            else
+              echo "    ${WHEEL_NAME}: matching sha256."
+            fi
+          done
+          rm -f pypi_info.json
+
+          if [[ "$ANY_CONFLICT" == "true" ]]; then
+            echo "::error::Aborting publish to prevent silent corruption of an existing release."
+            exit 1
+          elif [[ "$ALL_MATCH" == "true" ]]; then
+            echo "==> All ${#WHEEL_FILES[@]} wheel(s) match PyPI exactly; skipping publish (idempotent re-run path)."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "==> At least one wheel is missing or conflicted; proceeding with publish."
+          fi
+
       - name: Publish to PyPI
+        if: steps.check_idemp.outputs.skip != 'true'
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: python/heritage_models/dist/
