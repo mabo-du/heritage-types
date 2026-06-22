@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.0.5] — 2026-06-23
+
+### Fixed
+
+- **TypeScript package metadata hardening** — `@mabo-du/heritage-types` now publishes with a non-null `author` field (`"Mark Bouck <markbouck@duck.com>"`) on the npm registry. Forward-fix from commit `c7462de` on this repo. npm reads `package.json` only at publish time, so the live registry reflects this for `2.0.5+` only; pre-existing version metadata (2.0.0/2.0.1/2.0.4) on the registry continues to show `author: null`. No schema, model, or public API surface change; pure metadata.
+
+[2.0.5]: https://github.com/mabo-du/heritage-types/releases/tag/v2.0.5
+
 ## [2.0.4] — 2026-06-22
 
 ### Notes
