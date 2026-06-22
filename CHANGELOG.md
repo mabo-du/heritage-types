@@ -52,8 +52,10 @@
   PyPI is **intentional**: those wheels were built before this
   hardening's `TZ: UTC` binding landed, so the gating correctly
   refuses to overwrite them. Bit-exact closure at PyPI will happen
-  at the next version-bump that is built by this hardened pipeline
-  against a GREEN PyPI registry.
+  at the next version-bump that is published against a clean
+  registry state — i.e. one where no pre-existing bytes for that
+  version conflict with the gate's local-rebuild SHA256, so the
+  gate emits `skip=true` from the first dispatch.
 
 ## [2.0.2] — 2026-06-22
 
