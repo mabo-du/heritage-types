@@ -97,7 +97,7 @@ jobs:
         run: |
           cd typescript
           npm install
-          npx tsc --noEmit -p .
+          ./node_modules/.bin/tsc --noEmit -p .
 
       - name: Build dist for npm
         run: |
