@@ -60,3 +60,8 @@ This project is indexed by GitNexus as **heritage-types** (579 symbols, 715 rela
 | Index, status, clean, wiki CLI commands | `.claude/skills/gitnexus/gitnexus-cli/SKILL.md` |
 
 <!-- gitnexus:end -->
+
+<!-- governance-rule: git-rm-cached-only -->
+## File deletion safety
+
+Never delete a file from local disk as part of a `.gitignore` / untrack-from-git request. Use `git rm --cached <file>` (untrack only, keep the file on disk) — never plain `rm` or `git rm` without `--cached` — unless deleting the file from disk has been explicitly and separately requested.

@@ -206,3 +206,7 @@ currently does not need (per the AGENTS.md "minimal surface area"
 philosophy).  
 **Approver:** Mark Bouck (solo maintainer).
 
+<!-- governance-rule: git-rm-cached-only -->
+## File deletion safety
+
+Never delete a file from local disk as part of a `.gitignore` / untrack-from-git request. Use `git rm --cached <file>` (untrack only, keep the file on disk) — never plain `rm` or `git rm` without `--cached` — unless deleting the file from disk has been explicitly and separately requested.

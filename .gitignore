@@ -31,3 +31,4 @@ typescript/package-lock.json
 # committed template that collaborators copy to .env (which IS
 # gitignored). Adding .env.example to .gitignore defeats its purpose.
 .beads/
+.aider*
