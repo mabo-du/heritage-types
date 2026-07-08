@@ -81,9 +81,9 @@ def test_children_of_rejects_zero_limit() -> None:
 )
 def test_sanitise_strips_dangerous_chars(term: str) -> None:
     out = sanitise_fts_term(term)
-    assert '"' not in out, f'embedded double-quote survived in {out!r}'
-    assert "*" not in out, f'FTS5 wildcard survived in {out!r}'
-    assert ";" not in out, f'FTS5 statement terminator survived in {out!r}'
+    assert '"' not in out, f"embedded double-quote survived in {out!r}"
+    assert "*" not in out, f"FTS5 wildcard survived in {out!r}"
+    assert ";" not in out, f"FTS5 statement terminator survived in {out!r}"
 
 
 def test_sanitise_drops_fullwidth_homoglyphs() -> None:
@@ -125,9 +125,7 @@ def test_auto_create_then_queries_work() -> None:
         assert any(t.preferred_label == "Flint/Chert" for t in results)
 
         with sqlite3.connect(path) as conn:
-            count = conn.execute(
-                "SELECT COUNT(*) FROM vocabulary_terms"
-            ).fetchone()[0]
+            count = conn.execute("SELECT COUNT(*) FROM vocabulary_terms").fetchone()[0]
             assert count >= 1
 
 

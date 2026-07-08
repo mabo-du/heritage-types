@@ -92,7 +92,9 @@ def test_published_schema_self_contained() -> None:
     seen: set[str] = set()
     _walk(schema, seen)
     missing = seen - set(defs.keys())
-    assert not missing, f"unresolved #/$defs refs in published schema: {sorted(missing)}"
+    assert not missing, (
+        f"unresolved #/$defs refs in published schema: {sorted(missing)}"
+    )
 
 
 def test_schema_version_is_required_and_pattern() -> None:
@@ -164,7 +166,10 @@ def test_missing_schema_version_rejected() -> None:
     del payload["schemaVersion"]
     with pytest.raises(Exception) as exc_info:
         HeritageDataPackage.model_validate(payload)
-    assert "schemaVersion" in str(exc_info.value).lower() or "required" in str(exc_info.value).lower()
+    assert (
+        "schemaVersion" in str(exc_info.value).lower()
+        or "required" in str(exc_info.value).lower()
+    )
 
 
 def test_find_with_provenance_round_trip() -> None:

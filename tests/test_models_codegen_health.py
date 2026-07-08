@@ -30,8 +30,8 @@ def test_no_rootmodel_uuid_in_models() -> None:
         "_post_process_models in scripts/generate_python.py likely stopped "
         "matching the new datamodel-codegen emit shape; update the regex "
         "or rewrite surgically. Without this guard, every consumer crashes "
-        "at first import with 'Unable to apply constraint \"pattern\" to "
-        "schema of type \"uuid\"'."
+        'at first import with \'Unable to apply constraint "pattern" to '
+        'schema of type "uuid"\'.'
     )
 
 
@@ -95,8 +95,7 @@ def test_no_datamodel_codegen_header_in_models() -> None:
     # strip above might be silently no-op'ing because the header never
     # matched in the first place.
     assert (
-        "# Auto-generated Pydantic v2 models from heritage-types "
-        "TypeSpec source."
+        "# Auto-generated Pydantic v2 models from heritage-types TypeSpec source."
     ) in text, (
         "codegen header regression: the stable replacement banner "
         "('# Auto-generated Pydantic v2 models from heritage-types "

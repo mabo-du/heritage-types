@@ -73,15 +73,23 @@ def main() -> None:
         # `HeritageDataPackage` intact in the generated module.
         result = subprocess.run(
             [
-                sys.executable, "-m", "datamodel_code_generator",
-                "--input", str(inlined_path),
-                "--input-file-type", "jsonschema",
-                "--output", str(OUTPUT_DIR / "models.py"),
-                "--class-name", "HDP",
-                "--target-python-version", "3.11",
+                sys.executable,
+                "-m",
+                "datamodel_code_generator",
+                "--input",
+                str(inlined_path),
+                "--input-file-type",
+                "jsonschema",
+                "--output",
+                str(OUTPUT_DIR / "models.py"),
+                "--class-name",
+                "HDP",
+                "--target-python-version",
+                "3.11",
                 "--field-constraints",
             ],
-            capture_output=True, text=True,
+            capture_output=True,
+            text=True,
         )
 
         if result.returncode != 0:
@@ -138,8 +146,7 @@ def _post_process_models(text: str) -> str:
     # carries attribution to the heritage-types source-of-truth path.
     text = (
         "# Auto-generated Pydantic v2 models from heritage-types TypeSpec source.\n"
-        "# Do not edit directly -- edit spec/main.tsp and run `make all`.\n"
-        + text
+        "# Do not edit directly -- edit spec/main.tsp and run `make all`.\n" + text
     )
 
     # Uuid: keep the Field but wrap in RootModel[str].
@@ -173,7 +180,7 @@ def _drop_import_symbol(text: str, prefix: str, symbol: str) -> str:
     out_lines: list[str] = []
     for line in text.splitlines():
         if line.startswith(prefix) and symbol in line:
-            payload = line[len(prefix):].strip()
+            payload = line[len(prefix) :].strip()
             symbols = [s.strip() for s in payload.split(",") if s.strip()]
             kept = [s for s in symbols if s != symbol]
             if not kept:

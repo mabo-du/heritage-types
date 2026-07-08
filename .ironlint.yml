@@ -1,0 +1,15 @@
+checks:
+  no-fixme:
+    files: ["*"]
+    run: "! grep -nE 'FIXME'"
+  no-merge-markers:
+    files: ["*"]
+    run: "! grep -nE '^(<<<<<<< |=======$|>>>>>>> )'"
+
+  no-console-log-js:
+    files: ["**/*.{ts,tsx,js,mjs,cjs}"]
+    run: "! grep -nE 'console\\.(log|warn|error)\\('"
+  tsc-check:
+    files: ["**/*.{ts,tsx}"]
+    on: [pre-commit]
+    run: "for d in $(echo \"$IRONLINT_FILES\" | while read f; do d=$(dirname \"$f\"); while [ \"$d\" != '.' ] && [ ! -f \"$d/tsconfig.json\" ]; do d=$(dirname \"$d\"); done; [ \"$d\" != '.' ] && echo \"$d\"; done | sort -u); do (cd \"$d\" && tsc --noEmit) || exit 1; done 2>&1"

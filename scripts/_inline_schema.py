@@ -93,7 +93,9 @@ if __name__ == "__main__":
     import sys
 
     if len(sys.argv) != 2:
-        print("usage: inline_schema.py <path/to/HeritageDataPackage.json>",
-              file=sys.stderr)
+        print(
+            "usage: inline_schema.py <path/to/HeritageDataPackage.json>",
+            file=sys.stderr,
+        )
         sys.exit(2)
     publish_in_place(Path(sys.argv[1]))

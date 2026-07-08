@@ -183,7 +183,9 @@ class VocabularyService:
         if results:
             return results[0]
         results = self.search(raw_term, vocabulary="aat", limit=1)
-        if results and self._label_similar(raw_term, results[0].preferred_label.lower()):
+        if results and self._label_similar(
+            raw_term, results[0].preferred_label.lower()
+        ):
             return results[0]
         return None
 
@@ -359,46 +361,71 @@ class VocabularyService:
         # source==FALLBACK_SOURCE_TAG will at least see obviously
         # non-AAT URIs.
         material_map: dict[str, tuple[str, str, str]] = {
-            "flint":    (f"{_FALLBACK_URI_PREFIX}material/flint-chert",
-                         "Flint/Chert",
-                         "A compact, microcrystalline quartz mineral used for tool making."),
-            "chert":    (f"{_FALLBACK_URI_PREFIX}material/flint-chert",
-                         "Flint/Chert",
-                         "A compact, microcrystalline quartz mineral used for tool making."),
-            "pottery":  (f"{_FALLBACK_URI_PREFIX}material/pottery",
-                         "Pottery (object genre)",
-                         "Ceramic ware made from fired clay, usually glazed."),
-            "ceramic":  (f"{_FALLBACK_URI_PREFIX}material/pottery",
-                         "Pottery (object genre)",
-                         "Ceramic ware made from fired clay, usually glazed."),
-            "bone":     (f"{_FALLBACK_URI_PREFIX}material/bone",
-                         "Bone (material)",
-                         "The hard, rigid form of connective tissue constituting the skeleton."),
-            "metal":    (f"{_FALLBACK_URI_PREFIX}material/metal",
-                         "Metal",
-                         "Any of various opaque, fusible, malleable substances."),
-            "iron":     (f"{_FALLBACK_URI_PREFIX}material/iron",
-                         "Iron (metal)",
-                         "A metallic element occurring naturally as haematite."),
-            "glass":    (f"{_FALLBACK_URI_PREFIX}material/glass",
-                         "Glass (material)",
-                         "A hard, amorphous material made by melting sand with soda."),
-            "cbm":      (f"{_FALLBACK_URI_PREFIX}material/cbm",
-                         "Ceramic building material",
-                         "Baked clay products used in building construction."),
-            "slag":     (f"{_FALLBACK_URI_PREFIX}material/slag",
-                         "Slag",
-                         "The fused refuse matter separated during smelting."),
+            "flint": (
+                f"{_FALLBACK_URI_PREFIX}material/flint-chert",
+                "Flint/Chert",
+                "A compact, microcrystalline quartz mineral used for tool making.",
+            ),
+            "chert": (
+                f"{_FALLBACK_URI_PREFIX}material/flint-chert",
+                "Flint/Chert",
+                "A compact, microcrystalline quartz mineral used for tool making.",
+            ),
+            "pottery": (
+                f"{_FALLBACK_URI_PREFIX}material/pottery",
+                "Pottery (object genre)",
+                "Ceramic ware made from fired clay, usually glazed.",
+            ),
+            "ceramic": (
+                f"{_FALLBACK_URI_PREFIX}material/pottery",
+                "Pottery (object genre)",
+                "Ceramic ware made from fired clay, usually glazed.",
+            ),
+            "bone": (
+                f"{_FALLBACK_URI_PREFIX}material/bone",
+                "Bone (material)",
+                "The hard, rigid form of connective tissue constituting the skeleton.",
+            ),
+            "metal": (
+                f"{_FALLBACK_URI_PREFIX}material/metal",
+                "Metal",
+                "Any of various opaque, fusible, malleable substances.",
+            ),
+            "iron": (
+                f"{_FALLBACK_URI_PREFIX}material/iron",
+                "Iron (metal)",
+                "A metallic element occurring naturally as haematite.",
+            ),
+            "glass": (
+                f"{_FALLBACK_URI_PREFIX}material/glass",
+                "Glass (material)",
+                "A hard, amorphous material made by melting sand with soda.",
+            ),
+            "cbm": (
+                f"{_FALLBACK_URI_PREFIX}material/cbm",
+                "Ceramic building material",
+                "Baked clay products used in building construction.",
+            ),
+            "slag": (
+                f"{_FALLBACK_URI_PREFIX}material/slag",
+                "Slag",
+                "The fused refuse matter separated during smelting.",
+            ),
         }
 
         if vocabulary in ("", "aat"):
             for key, (uri, label, note) in material_map.items():
                 if term_lower == key or term_lower in key or key in term_lower:
-                    matches.append(VocabTerm(
-                        id=uri, source=FALLBACK_SOURCE_TAG,
-                        preferred_label=label,
-                        alt_labels=[key], scope_note=note, parent_id=None,
-                    ))
+                    matches.append(
+                        VocabTerm(
+                            id=uri,
+                            source=FALLBACK_SOURCE_TAG,
+                            preferred_label=label,
+                            alt_labels=[key],
+                            scope_note=note,
+                            parent_id=None,
+                        )
+                    )
 
         # Common period terms. URIs are UNVERIFIED sentinel IDs (see
         # REVIEW.md H4) — each gets its own distinct IRI under
@@ -406,39 +433,60 @@ class VocabularyService:
         # NOT collide on a single shared ID the way the pre-2.0.0 map
         # did (aat/300019275 was reused for two distinct concepts).
         period_map: dict[str, tuple[str, str, str]] = {
-            "palaeolithic":   (f"{_FALLBACK_URI_PREFIX}period/palaeolithic",
-                               "Palaeolithic",
-                               "The earliest prehistoric period of human development."),
-            "mesolithic":     (f"{_FALLBACK_URI_PREFIX}period/mesolithic",
-                               "Mesolithic",
-                               "The middle period of the Stone Age."),
-            "neolithic":      (f"{_FALLBACK_URI_PREFIX}period/neolithic",
-                               "Neolithic",
-                               "The late period of the Stone Age."),
-            "bronze age":     (f"{_FALLBACK_URI_PREFIX}period/bronze-age",
-                               "Bronze Age",
-                               "The period characterized by the use of bronze tools."),
-            "iron age":       (f"{_FALLBACK_URI_PREFIX}period/iron-age",
-                               "Iron Age",
-                               "The period characterized by the use of iron tools."),
-            "roman":          (f"{_FALLBACK_URI_PREFIX}period/roman",
-                               "Roman (ancient)",
-                               "The culture and period of ancient Rome."),
-            "medieval":       (f"{_FALLBACK_URI_PREFIX}period/medieval",
-                               "Medieval",
-                               "The period between classical antiquity and the Renaissance."),
-            "post-medieval":  (f"{_FALLBACK_URI_PREFIX}period/post-medieval",
-                               "Post-medieval",
-                               "The period after the Middle Ages."),
+            "palaeolithic": (
+                f"{_FALLBACK_URI_PREFIX}period/palaeolithic",
+                "Palaeolithic",
+                "The earliest prehistoric period of human development.",
+            ),
+            "mesolithic": (
+                f"{_FALLBACK_URI_PREFIX}period/mesolithic",
+                "Mesolithic",
+                "The middle period of the Stone Age.",
+            ),
+            "neolithic": (
+                f"{_FALLBACK_URI_PREFIX}period/neolithic",
+                "Neolithic",
+                "The late period of the Stone Age.",
+            ),
+            "bronze age": (
+                f"{_FALLBACK_URI_PREFIX}period/bronze-age",
+                "Bronze Age",
+                "The period characterized by the use of bronze tools.",
+            ),
+            "iron age": (
+                f"{_FALLBACK_URI_PREFIX}period/iron-age",
+                "Iron Age",
+                "The period characterized by the use of iron tools.",
+            ),
+            "roman": (
+                f"{_FALLBACK_URI_PREFIX}period/roman",
+                "Roman (ancient)",
+                "The culture and period of ancient Rome.",
+            ),
+            "medieval": (
+                f"{_FALLBACK_URI_PREFIX}period/medieval",
+                "Medieval",
+                "The period between classical antiquity and the Renaissance.",
+            ),
+            "post-medieval": (
+                f"{_FALLBACK_URI_PREFIX}period/post-medieval",
+                "Post-medieval",
+                "The period after the Middle Ages.",
+            ),
         }
 
         for key, (uri, label, note) in period_map.items():
             if term_lower == key or term_lower in key or key in term_lower:
-                matches.append(VocabTerm(
-                    id=uri, source=FALLBACK_SOURCE_TAG,
-                    preferred_label=label,
-                    alt_labels=[key], scope_note=note, parent_id=None,
-                ))
+                matches.append(
+                    VocabTerm(
+                        id=uri,
+                        source=FALLBACK_SOURCE_TAG,
+                        preferred_label=label,
+                        alt_labels=[key],
+                        scope_note=note,
+                        parent_id=None,
+                    )
+                )
 
         return matches[:limit]
 
@@ -459,20 +507,55 @@ class VocabularyService:
                 ");"
             )
             samples = [
-                ("http://vocab.getty.edu/aat/300011754", "aat", "Flint/Chert",
-                 '["flint", "chert", "flint stone"]', "Microcrystalline quartz mineral."),
-                ("http://vocab.getty.edu/aat/300054926", "aat", "Pottery (object genre)",
-                 '["pottery", "ceramic", "earthenware"]', "Ceramic ware from fired clay."),
-                ("http://vocab.getty.edu/aat/300011799", "aat", "Bone (material)",
-                 '["bone", "skeletal material"]', "Hard connective tissue."),
-                ("http://vocab.getty.edu/aat/300010902", "aat", "Iron (metal)",
-                 '["iron", "ferrous metal"]', "Metallic element."),
-                ("http://vocab.getty.edu/aat/300019275", "aat", "Bronze Age",
-                 '["bronze age", "bronze-age"]', "Period of bronze tool use."),
-                ("http://vocab.getty.edu/aat/300020533", "aat", "Roman (ancient)",
-                 '["roman", "romano-british"]', "Ancient Roman culture."),
-                ("http://vocab.getty.edu/aat/300020756", "aat", "Medieval",
-                 '["medieval", "middle ages"]', "Period 5th-15th century."),
+                (
+                    "http://vocab.getty.edu/aat/300011754",
+                    "aat",
+                    "Flint/Chert",
+                    '["flint", "chert", "flint stone"]',
+                    "Microcrystalline quartz mineral.",
+                ),
+                (
+                    "http://vocab.getty.edu/aat/300054926",
+                    "aat",
+                    "Pottery (object genre)",
+                    '["pottery", "ceramic", "earthenware"]',
+                    "Ceramic ware from fired clay.",
+                ),
+                (
+                    "http://vocab.getty.edu/aat/300011799",
+                    "aat",
+                    "Bone (material)",
+                    '["bone", "skeletal material"]',
+                    "Hard connective tissue.",
+                ),
+                (
+                    "http://vocab.getty.edu/aat/300010902",
+                    "aat",
+                    "Iron (metal)",
+                    '["iron", "ferrous metal"]',
+                    "Metallic element.",
+                ),
+                (
+                    "http://vocab.getty.edu/aat/300019275",
+                    "aat",
+                    "Bronze Age",
+                    '["bronze age", "bronze-age"]',
+                    "Period of bronze tool use.",
+                ),
+                (
+                    "http://vocab.getty.edu/aat/300020533",
+                    "aat",
+                    "Roman (ancient)",
+                    '["roman", "romano-british"]',
+                    "Ancient Roman culture.",
+                ),
+                (
+                    "http://vocab.getty.edu/aat/300020756",
+                    "aat",
+                    "Medieval",
+                    '["medieval", "middle ages"]',
+                    "Period 5th-15th century.",
+                ),
             ]
             # Named-column INSERT so adding a column doesn't silently
             # shift positional parameters.

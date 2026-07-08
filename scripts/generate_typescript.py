@@ -70,7 +70,7 @@ def _enum_lines(enums: dict[str, dict]) -> list[str]:
     for name, sch in sorted(enums.items()):
         out.append(f"export enum {name} {{")
         for v in sch.get("enum", []):
-            out.append(f"  {v} = \"{v}\",")
+            out.append(f'  {v} = "{v}",')
         out.append("}")
         out.append("")
     return out
@@ -177,7 +177,9 @@ def main() -> None:
         )
     else:
         version = "2.0.0"
-        description = "Auto-generated TypeScript types from heritage-types canonical schemas"
+        description = (
+            "Auto-generated TypeScript types from heritage-types canonical schemas"
+        )
 
     # Patch existing typescript/package.json instead of overwriting it.
     # The published npm package lives under @mabo-du/heritage-types
