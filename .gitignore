@@ -16,6 +16,7 @@ https:/
 # Local dev artifacts — GitNexus index and Claude skill configs.
 .claude/
 .ctx/
+.ironlint/
 typescript/package-lock.json
 
 # Charter / agent session artifacts

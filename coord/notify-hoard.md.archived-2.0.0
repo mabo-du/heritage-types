@@ -15,7 +15,7 @@ tooling writes or reads. You will need to bump your pin from
 `heritage-models>=1.0` to `heritage-models>=2.0,<3.0` and populate
 the new field.
 
-The sentinel `RELEASE_NOTIFIED_MARK` in `/home/mark/Projects/heritage-types`
+The sentinel `RELEASE_NOTIFIED_MARK` in `/home/mark/Projects/dig-tools/heritage-types`
 pins the coordination timestamp. PyPI URL draft below — replace with
 actual on publish.
 
@@ -73,7 +73,7 @@ other change is purely additive.
 
    ```bash
    # In HOARD, switch to a local editable install of heritage-types
-   pip install -e /home/mark/Projects/heritage-types/python/heritage_models
+   pip install -e /home/mark/Projects/dig-tools/heritage-types/python/heritage_models
    pytest tests/
    ```
 

@@ -66,7 +66,7 @@ Single breaking field: `schemaVersion`.
 4. **Test locally before publish lands upstream:**
 
    ```bash
-   pip install -e /home/mark/Projects/heritage-types/python/heritage_models
+   pip install -e /home/mark/Projects/dig-tools/heritage-types/python/heritage_models
    pytest tests/
    ```
 

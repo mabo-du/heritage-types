@@ -17,14 +17,14 @@ instead only *reads* them (e.g. imported from HOARD or from user-
 uploaded `.hmatrix.json`), the migration is read-side only.
 
 The `RELEASE_NOTIFIED_MARK` sentinel inside
-`/home/mark/Projects/heritage-types` pins the coordination timestamp.
+`/home/mark/Projects/dig-tools/heritage-types` pins the coordination timestamp.
 PyPI URL below — replace with actual on publish.
 
 ## What's changing in `@mabo-du/heritage-types` from `heritage-types==2.0.0`
 
 (Note: `@mabo-du/heritage-types` is private — vendored, not on npm. The
 authors of this repo should re-run `make all` in
-`/home/mark/Projects/heritage-types` and re-vendor
+`/home/mark/Projects/dig-tools/heritage-types` and re-vendor
 `typescript/src/index.ts` into StratiGraph's source tree.)
 
 | TS type | Old shape (1.x) | New shape (2.0.0) |
@@ -45,7 +45,7 @@ SchemaVer`. Everything else is additive.
    heritage-types after `make all VERSION=1`:
 
    ```bash
-   cd /home/mark/Projects/heritage-types
+   cd /home/mark/Projects/dig-tools/heritage-types
    make all VERSION=1
    # The new index.ts is at typescript/src/index.ts
    cp typescript/src/index.ts /path/to/stratigraph/.../heritage-types.ts

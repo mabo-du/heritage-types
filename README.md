@@ -1,96 +1,73 @@
+<p align="center">
+  <img src="docs/brand/project-lockup.svg" alt="Dig:Tools" width="720">
+</p>
+
 # heritage-types
 
-**Canonical data models for the HOARD heritage science ecosystem.**
+> Canonical, generated data models for interoperable digital-heritage tools.
 
-This repository is not a standalone product. It is an infrastructure dependency that provides shared data type definitions used by multiple projects in the ecosystem. End users should never need to interact with this repository directly — the Python package (`heritage-models`) is installed automatically as a dependency of HOARD.
+[![License: MIT](https://img.shields.io/badge/license-MIT-2ea44f.svg)](LICENSE)
+[![npm](https://img.shields.io/npm/v/@mabo-du/heritage-types?logo=npm)](https://www.npmjs.com/package/@mabo-du/heritage-types)
+[![GitHub](https://img.shields.io/badge/GitHub-dig--tools%2Fheritage--types-181717?logo=github)](https://github.com/dig-tools/heritage-types)
 
-## What This Provides
+`heritage-types` is infrastructure, not an end-user application. It defines one
+TypeSpec source model and generates JSON Schema, Pydantic models, and TypeScript
+interfaces so Dig:Tools applications can exchange records without redefining
+contexts, finds, samples, dates, assets, or provenance.
 
-### Python: `heritage-models`
+## Packages and artefacts
+
+| Output | Use |
+|---|---|
+| `schemas/heritage-data-package-v*.json` | Language-neutral validation with JSON Schema 2020-12 |
+| `heritage-models` | Generated Pydantic v2 models for Python |
+| `heritage-vocab` | Offline vocabulary normalisation service |
+| `@mabo-du/heritage-types` | Generated TypeScript interfaces |
+
+The npm scope remains `@mabo-du` for package-name stability even though the
+source repository is owned by the `dig-tools` GitHub organisation.
+
+## Core model
+
+`HeritageDataPackage` combines site metadata, stratigraphic units and
+relationships, finds, samples, chronologies, digital assets, and explicit
+provenance agents/activities/records. See [`spec/main.tsp`](spec/main.tsp) for
+the authoritative definitions.
+
+## Generation flow
+
+```text
+spec/main.tsp
+    ↓ TypeSpec
+schemas/*.json
+    ├─→ python/heritage_models/
+    └─→ typescript/src/
+
+python/heritage_vocab/ is maintained alongside the generated models.
+```
+
+Do not hand-edit generated schema, Pydantic, or TypeScript output. Change
+`spec/main.tsp`, regenerate all targets, inspect the diff, and run the full tests.
 
 ```bash
-# Installed automatically with HOARD
-pip install hoard
-
-# Or install standalone
-pip install heritage-models
+git clone https://github.com/dig-tools/heritage-types.git
+cd heritage-types
+npm ci
+python -m pip install pytest pydantic
+make all
+make test
 ```
 
-Provides Pydantic v2 models for all core heritage data types:
-- `StratigraphicUnit` — archaeological context sheet data
-- `StratigraphicRelationship` — stratigraphic relationships (cuts, fills, equals)
-- `Find` — artefact records
-- `Sample` — environmental/C14/isotopic sample data
-- `Chronology` — calibrated radiocarbon dates
-- `DigitalAsset` — photographs, drawings, GIS layers
-- `SiteMetadata` — project-level metadata
-- `ProvenanceAgent` — agent identity (Human / AIModel / Software) for who/what created a record
-- `ProvenanceActivity` — named action performed by a `ProvenanceAgent`
-- `ProvenanceRecord` — per-record audit-trail entry (entity, activity, agent, time, confidence)
-- `HeritageDataPackage` — full project container for cross-tool exchange
+See [USER_GUIDE.md](USER_GUIDE.md) for consumer examples and versioning guidance,
+and [PUBLISH_RUNBOOK.md](PUBLISH_RUNBOOK.md) for maintainer release operations.
 
-### Python: `heritage-vocab`
+## Versioning
 
-Optional offline vocabulary service for Getty AAT/ULAN/TGN term normalisation. Provides material and period standardisation with a built-in fallback covering common archaeological terms.
+Additive optional fields normally require a minor version. Removing or renaming
+an existing field is a coordinated breaking change and requires a major version.
+Generated outputs and consumer notification are part of the change, not follow-up
+work.
 
-```python
-from heritage_vocab import VocabularyService
+## Licence
 
-svc = VocabularyService()
-result = svc.normalise_material("flint")
-# → VocabTerm(id="http://vocab.getty.edu/aat/300011754",
-#             preferred_label="Flint/Chert")
-```
-
-### TypeScript: `@mabo-du/heritage-types`
-
-> **Published to npm since v2.0.1** as the canonical, permanent name at
-> [`@mabo-du/heritage-types`](https://www.npmjs.com/package/@mabo-du/heritage-types).
-> The `@heritage/` npmjs scope is **not** part of the roadmap.
-> The `typescript/` directory contains auto-generated TypeScript
-> interfaces for web-based tools (StratiGraph, Libby frontend).
-> Consumers can either `npm install @mabo-du/heritage-types` or
-> continue vendoring `typescript/src/index.ts`; both paths are
-> first-class per [`AGENTS.md ## Ecosystem Context`](AGENTS.md).
-
-### JSON Schema
-
-Canonical JSON Schema files in `schemas/` — language-agnostic, usable from any programming environment for data validation.
-
-## Source of Truth
-
-All models are defined in TypeSpec (`spec/main.tsp`) and compiled to JSON Schema Draft 2020-12. Python and TypeScript packages are auto-generated from the compiled schemas.
-
-```
-spec/main.tsp  (TypeSpec)
-       │
-       ▼
-schemas/*.json  (JSON Schema)
-       │
-       ├──► python/heritage_models/  (Pydantic v2, auto-generated)
-       ├──► python/heritage_vocab/   (vocabulary service)
-       └──► typescript/              (TypeScript interfaces)
-```
-
-## Development
-
-```bash
-make all        # Full build: compile → python → typescript
-make compile    # TypeSpec → JSON Schema only
-make python     # Regenerate Python models
-make typescript # Regenerate TypeScript types
-```
-
-## Repository Architecture
-
-This is one of three infrastructure repositories that support the HOARD ecosystem:
-
-| Repository | Purpose | User-facing |
-|------------|---------|-------------|
-| **HOARD** | Main archaeological report pipeline | Yes — `pip install hoard` |
-| **heritage-types** | Shared data models (this repo) | No — pulled in as dependency |
-| **heritage-cli** | Unified ecosystem CLI | Optional — `pip install heritage-cli` |
-
-## License
-
-MIT
+MIT. See [LICENSE](LICENSE).
