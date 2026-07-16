@@ -65,8 +65,8 @@ make test                  # pytest + tsc --noEmit
 ```
 
 All 30 tests should pass; `tsc --noEmit` should be clean; the codegen
-smoke guard (`tests/test_models_codegen_health.py`) should detect no
-`RootModel[UUID]` / `RootModel[AwareDatetime]` drift.
+smoke guard (`tests/test_models_codegen_health.py`) should reject
+`RootModel[UUID]` drift and require `RootModel[AwareDatetime]` validation.
 
 ### 5. Tag
 

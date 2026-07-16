@@ -75,8 +75,8 @@ The workflow will:
 1. Validate the acknowledgement substring.
 2. Re-derive the schema-versioned filename from `tag_to_publish`.
 3. Re-generate Pydantic + TypeScript from `spec/main.tsp`.
-4. Run the codegen smoke guard (catches `RootModel[UUID]` /
-   `RootModel[AwareDatetime]` drift).
+4. Run the codegen smoke guard (rejects constrained `RootModel[UUID]` drift
+   and requires `RootModel[AwareDatetime]` validation).
 5. Build a `pyproject-build` distribution.
 6. Publish to PyPI via `pypa/gh-action-pypi-publish`.
 

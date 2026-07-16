@@ -148,7 +148,7 @@ jobs:
           import pathlib
           text = pathlib.Path('python/heritage_models/models.py').read_text()
           assert 'RootModel[UUID]' not in text, 'codegen drift: _post_process_models missed RootModel[UUID]'
-          assert 'RootModel[AwareDatetime]' not in text, 'codegen drift: _post_process_models missed RootModel[AwareDatetime]'
+          assert 'class Datetime(RootModel[AwareDatetime])' in text, 'codegen drift: timezone-aware datetime validation is missing'
           print('codegen smoke guard OK')
           "
 
