@@ -98,15 +98,15 @@ def main() -> None:
             sys.exit(1)
 
         # Pydantic refuses to apply ``Field(pattern=...)`` to a non-``str``
-        # ``RootModel`` type (e.g. ``UUID``, ``AwareDatetime``) with the
+        # ``RootModel`` type (currently the generated ``UUID`` wrapper) with the
         # message ``TypeError: Unable to apply constraint 'pattern' to
         # supplied value ... for schema of type 'uuid'``. datamodel-codegen
         # emits those wrappers when the JSON Schema uses ``format: uuid`` /
         # ``format: date-time`` *and* ``--field-constraints`` is set. The
-        # fix is local: collapse the wrapper type to ``str`` so the regex
-        # pattern can attach. The accompanying Pydantic validators
-        # (root: UUID, root: AwareDatetime) raise if the raw string is
-        # malformed at runtime — both are catchable for our use case.
+        # fix is local: collapse only that wrapper type to ``str`` so the regex
+        # pattern can attach. Datetime deliberately remains
+        # ``RootModel[AwareDatetime]`` so Pydantic continues enforcing both
+        # ISO-8601 syntax and timezone awareness.
         models_path = OUTPUT_DIR / "models.py"
         text = models_path.read_text()
         text = _post_process_models(text)
@@ -120,7 +120,7 @@ def main() -> None:
 
 
 def _post_process_models(text: str) -> str:
-    """Re-shape ``RootModel[UUID]`` / ``RootModel[AwareDatetime]`` to ``str``.
+    """Re-shape the constrained ``RootModel[UUID]`` wrapper to ``str``.
 
     datamodel-codegen's ``--field-constraints`` output exposes a Pydantic
     design choice we don't want: ``Field(pattern=...)`` on a ``RootModel[UUID]``
@@ -155,17 +155,9 @@ def _post_process_models(text: str) -> str:
         r"class Uuid(RootModel[str]):\n\1root: str",
         text,
     )
-    # Datetime: drop AwareDatetime constraint; keep as string root, the
-    # JSON Schema still requires ``format: date-time``.
-    text = re.sub(
-        r"class\s+Datetime\(RootModel\[AwareDatetime\]\):\s*\n(\s+)root:\s+AwareDatetime\b",
-        r"class Datetime(RootModel[str]):\n\1root: str",
-        text,
-    )
     # Now drop the now-unused imports *without* nuking other symbols
     # sharing the same line (RootModel, BaseModel, Field, …).
     text = re.sub(r"^from\s+uuid\s+import\s+UUID\n", "", text, flags=re.MULTILINE)
-    text = _drop_import_symbol(text, "from pydantic import", "AwareDatetime")
     return text
 
 

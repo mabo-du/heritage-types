@@ -46,6 +46,20 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 SCHEMA_PATH = REPO_ROOT / "schemas" / "heritage-data-package-v1.json"
 
 
+def test_datetime_rejects_invalid_and_timezone_naive_values() -> None:
+    """Generated date-time fields enforce syntax and timezone awareness."""
+    from pydantic import ValidationError
+
+    from heritage_models import Datetime
+
+    with pytest.raises(ValidationError):
+        Datetime.model_validate("not-a-date")
+    with pytest.raises(ValidationError):
+        Datetime.model_validate("2026-07-17T12:00:00")
+
+    assert Datetime.model_validate("2026-07-17T12:00:00Z").root.tzinfo is not None
+
+
 @pytest.fixture(scope="module")
 def canonical_schema() -> dict[str, Any]:
     return json.loads(SCHEMA_PATH.read_text())

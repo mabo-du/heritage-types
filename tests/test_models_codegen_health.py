@@ -1,8 +1,8 @@
 """Smoke guard for codegen drift.
 
 `scripts/generate_python.py:_post_process_models` rewrites
-``RootModel[UUID]`` → ``RootModel[str]`` (and the same for
-``AwareDatetime``) so Pydantic accepts the ``Field(pattern=...)``
+``RootModel[UUID]`` → ``RootModel[str]`` so Pydantic accepts the
+``Field(pattern=...)``
 constraints. If the underlying ``datamodel-codegen`` or ``pydantic``
 ever changes its emit shape, that regex silently misses and the
 generated ``models.py`` ships with a constraint that Pydantic v2
@@ -36,11 +36,12 @@ def test_no_rootmodel_uuid_in_models() -> None:
 
 
 @pytest.mark.skipif(not MODELS_PATH.exists(), reason="models.py not generated yet")
-def test_no_rootmodel_aware_datetime_in_models() -> None:
+def test_datetime_retains_aware_datetime_validation() -> None:
     text = MODELS_PATH.read_text()
-    assert "RootModel[AwareDatetime]" not in text, (
-        "codegen drift: 'RootModel[AwareDatetime]' reappeared in models.py. "
-        "Same root cause as the RootModel[UUID] drift above."
+    assert "class Datetime(RootModel[AwareDatetime])" in text, (
+        "codegen drift: Datetime no longer uses Pydantic's AwareDatetime. "
+        "Without it, malformed or timezone-naive timestamps pass validation "
+        "despite the canonical schema's date-time format requirement."
     )
 
 

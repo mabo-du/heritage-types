@@ -53,7 +53,7 @@ Do not hand-edit generated schema, Pydantic, or TypeScript output. Change
 git clone https://github.com/dig-tools/heritage-types.git
 cd heritage-types
 npm ci
-python -m pip install pytest pydantic
+python -m pip install -r requirements-dev.txt
 make all
 make test
 ```

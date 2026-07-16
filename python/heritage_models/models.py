@@ -6,7 +6,7 @@ from __future__ import annotations
 from enum import StrEnum
 from typing import Any
 
-from pydantic import BaseModel, Field, RootModel
+from pydantic import AwareDatetime, BaseModel, Field, RootModel
 
 
 class HDP(RootModel[Any]):
@@ -15,70 +15,70 @@ class HDP(RootModel[Any]):
 
 class Uuid(RootModel[str]):
     root: str = Field(
-        ..., pattern="^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        ..., pattern='^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
     )
 
 
-class Datetime(RootModel[str]):
-    root: str
+class Datetime(RootModel[AwareDatetime]):
+    root: AwareDatetime
 
 
 class FieldId(RootModel[str]):
-    root: str = Field(..., pattern="^\\[?[A-Za-z0-9]+\\]?$")
+    root: str = Field(..., pattern='^\\[?[A-Za-z0-9]+\\]?$')
 
 
 class SchemaVer(RootModel[str]):
-    root: str = Field(..., pattern="^\\d+-\\d+-\\d+$")
+    root: str = Field(..., pattern='^\\d+-\\d+-\\d+$')
 
 
 class UnitType(StrEnum):
-    Deposit = "Deposit"
-    Cut = "Cut"
-    Interface = "Interface"
-    Masonry = "Masonry"
-    Natural = "Natural"
-    Unknown = "Unknown"
+    Deposit = 'Deposit'
+    Cut = 'Cut'
+    Interface = 'Interface'
+    Masonry = 'Masonry'
+    Natural = 'Natural'
+    Unknown = 'Unknown'
 
 
 class RelationshipType(StrEnum):
-    Above = "Above"
-    Below = "Below"
-    Equals = "Equals"
-    Contemporary = "Contemporary"
-    Cuts = "Cuts"
-    Fills = "Fills"
+    Above = 'Above'
+    Below = 'Below'
+    Equals = 'Equals'
+    Contemporary = 'Contemporary'
+    Cuts = 'Cuts'
+    Fills = 'Fills'
 
 
 class MaterialClass(StrEnum):
-    Pottery = "Pottery"
-    Bone = "Bone"
-    Flint = "Flint"
-    Metal = "Metal"
-    CBM = "CBM"
-    Glass = "Glass"
-    Shell = "Shell"
-    Slag = "Slag"
-    Wood = "Wood"
-    Textile = "Textile"
-    Leather = "Leather"
-    Environmental = "Environmental"
-    Other = "Other"
+    Pottery = 'Pottery'
+    Bone = 'Bone'
+    Flint = 'Flint'
+    Metal = 'Metal'
+    CBM = 'CBM'
+    Glass = 'Glass'
+    Shell = 'Shell'
+    Slag = 'Slag'
+    Wood = 'Wood'
+    Textile = 'Textile'
+    Leather = 'Leather'
+    Environmental = 'Environmental'
+    Other = 'Other'
 
 
 class SampleType(StrEnum):
-    Radiocarbon = "Radiocarbon"
-    Environmental = "Environmental"
-    Isotopic = "Isotopic"
-    Dendrochronology = "Dendrochronology"
-    Archaeomagnetic = "Archaeomagnetic"
-    OSL = "OSL"
-    Other = "Other"
+    Radiocarbon = 'Radiocarbon'
+    Environmental = 'Environmental'
+    Isotopic = 'Isotopic'
+    Dendrochronology = 'Dendrochronology'
+    Archaeomagnetic = 'Archaeomagnetic'
+    OSL = 'OSL'
+    Other = 'Other'
 
 
 class AgentType(StrEnum):
-    Human = "Human"
-    AIModel = "AIModel"
-    Software = "Software"
+    Human = 'Human'
+    AIModel = 'AIModel'
+    Software = 'Software'
 
 
 class SiteMetadata(BaseModel):

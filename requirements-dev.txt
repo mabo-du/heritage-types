@@ -1,0 +1,6 @@
+# Keep code generation byte-reproducible across local builds and CI.
+build>=1.2,<2
+datamodel-code-generator==0.65.0
+pydantic>=2,<3
+pytest>=8,<9
+ruff>=0.4

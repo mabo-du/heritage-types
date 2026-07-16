@@ -1,7 +1,7 @@
 # Coordination: heritage-types \u2192 HOARD (2.0.3 + 2.0.4 patches)
 
 > **Status:** OUTBOUND \u2014 ready for `gh issue create --repo mabo-du/HOARD`.
-> Companion playbook: [`PUBLISH_RUNBOOK.md`](https://github.com/mabo-du/heritage-types/blob/main/PUBLISH_RUNBOOK.md).
+> Companion playbook: [`PUBLISH_RUNBOOK.md`](https://github.com/dig-tools/heritage-types/blob/main/PUBLISH_RUNBOOK.md).
 
 ## TL;DR
 
@@ -51,7 +51,7 @@ the post-hardening releases, you can opt in:
 
 The `<3.0` upper bound is unchanged from prior guidance; the
 only breaking changes remain those communicated with the 2.0.0
-release (per https://github.com/mabo-du/heritage-types/releases/tag/v2.0.0).
+release (per https://github.com/dig-tools/heritage-types/releases/tag/v2.0.0).
 
 ## Bit-exact closure proof (operational detail)
 
@@ -67,9 +67,9 @@ same commit. This proves bit-exact closure of the prior drift.
 
 ## Reference
 
-- CHANGELOG: https://github.com/mabo-du/heritage-types/blob/main/CHANGELOG.md
-- v2.0.3 release: https://github.com/mabo-du/heritage-types/releases/tag/v2.0.3
-- v2.0.4 release: https://github.com/mabo-du/heritage-types/releases/tag/v2.0.4
+- CHANGELOG: https://github.com/dig-tools/heritage-types/blob/main/CHANGELOG.md
+- v2.0.3 release: https://github.com/dig-tools/heritage-types/releases/tag/v2.0.3
+- v2.0.4 release: https://github.com/dig-tools/heritage-types/releases/tag/v2.0.4
 - `heritage-models` 2.0.4: https://pypi.org/project/heritage-models/2.0.4/
 - `heritage-vocab` 2.0.4: https://pypi.org/project/heritage-vocab/2.0.4/
 

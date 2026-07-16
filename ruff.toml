@@ -1,0 +1,3 @@
+[lint.per-file-ignores]
+"python/heritage_models/__init__.py" = ["F403"] # Generated public re-export surface.
+"tests/test_heritage_models.py" = ["F401"] # Imports intentionally prove package exports.

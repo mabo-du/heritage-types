@@ -7,7 +7,7 @@
 > when the repo profile was different; for 2.0.3 + 2.0.4 there is no
 > public-issue path.
 >
-> Companion playbook: [`PUBLISH_RUNBOOK.md`](https://github.com/mabo-du/heritage-types/blob/main/PUBLISH_RUNBOOK.md).
+> Companion playbook: [`PUBLISH_RUNBOOK.md`](https://github.com/dig-tools/heritage-types/blob/main/PUBLISH_RUNBOOK.md).
 > Original 2.0.0-cycle DRAFT (now superseded): `coord/notify-stratigraph.md.archived-2.0.0`.
 
 ## TL;DR
@@ -66,9 +66,9 @@ None required. Optional follow-ups:
 
 ## Reference
 
-- CHANGELOG: https://github.com/mabo-du/heritage-types/blob/main/CHANGELOG.md
-- v2.0.3 release: https://github.com/mabo-du/heritage-types/releases/tag/v2.0.3
-- v2.0.4 release: https://github.com/mabo-du/heritage-types/releases/tag/v2.0.4
+- CHANGELOG: https://github.com/dig-tools/heritage-types/blob/main/CHANGELOG.md
+- v2.0.3 release: https://github.com/dig-tools/heritage-types/releases/tag/v2.0.3
+- v2.0.4 release: https://github.com/dig-tools/heritage-types/releases/tag/v2.0.4
 - npm package: https://www.npmjs.com/package/@mabo-du/heritage-types
 - `heritage-models` 2.0.4: https://pypi.org/project/heritage-models/2.0.4/
 - `heritage-vocab` 2.0.4: https://pypi.org/project/heritage-vocab/2.0.4/

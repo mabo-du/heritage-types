@@ -4,13 +4,23 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "heritage-models"
-version = "2.0.5"
+version = "2.0.6"
 description = "Canonical heritage science data models — Pydantic v2 types auto-generated from heritage-types TypeSpec schemas"
 requires-python = ">=3.11"
-license = { text = "MIT" }
+license = "MIT"
+license-files = ["LICENSE"]
+readme = "README.md"
+authors = [
+    { name = "Mark Bouck", email = "markbouck@duck.com" },
+]
 dependencies = [
     "pydantic>=2",
 ]
+
+[project.urls]
+Documentation = "https://github.com/dig-tools/heritage-types#readme"
+Issues = "https://github.com/dig-tools/heritage-types/issues"
+Repository = "https://github.com/dig-tools/heritage-types.git"
 
 [tool.setuptools]
 packages = ["heritage_models"]

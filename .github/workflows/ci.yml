@@ -21,7 +21,7 @@ jobs:
       - name: Install dev dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install datamodel-code-generator pytest
+          pip install -r requirements-dev.txt
           pip install -e python/heritage_models
           pip install -e python/heritage_vocab
       - name: Build schemas + models + vocab
@@ -38,6 +38,7 @@ jobs:
           mv schemas/HeritageDataPackage schemas/heritage-data-package-v1.json
           # Regenerate the Python package
           PYTHONPATH=scripts python scripts/generate_python.py
+          git diff --exit-code -- schemas/heritage-data-package-v1.json python/heritage_models
       - name: Run pytest
         run: PYTHONPATH=scripts python -m pytest tests/ -v
 
@@ -61,6 +62,7 @@ jobs:
           PYTHONPATH=scripts python scripts/_inline_schema.py schemas/HeritageDataPackage
           mv schemas/HeritageDataPackage schemas/heritage-data-package-v1.json
           PYTHONPATH=scripts python scripts/generate_typescript.py
+          git diff --exit-code -- schemas/heritage-data-package-v1.json typescript/src/index.ts
       - name: Install TypeScript
         run: npm install --no-save typescript@5.4
       - name: Typecheck

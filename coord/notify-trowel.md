@@ -1,7 +1,7 @@
 # Coordination: heritage-types \u2192 Trowel (2.0.3 + 2.0.4 patches)
 
 > **Status:** OUTBOUND \u2014 ready for `gh issue create --repo mabo-du/trowel`.
-> Companion playbook: [`PUBLISH_RUNBOOK.md`](https://github.com/mabo-du/heritage-types/blob/main/PUBLISH_RUNBOOK.md).
+> Companion playbook: [`PUBLISH_RUNBOOK.md`](https://github.com/dig-tools/heritage-types/blob/main/PUBLISH_RUNBOOK.md).
 
 ## TL;DR
 
@@ -17,7 +17,7 @@ patch-level releases since the coordinated 2.0.0 cycle.
 
 Nothing consumer-facing. The full diff is in
 `publish-models.yml`, `publish-vocab.yml`, and `publish-typescript.yml`
-(all in `https://github.com/mabo-du/heritage-types`):
+(all in `https://github.com/dig-tools/heritage-types`):
 
 - `env: SOURCE_DATE_EPOCH: ${{ steps.epoch.outputs.epoch }}` \u2014 wheel
   ZIP mtime is git-committer-time (commit-deterministic).
@@ -50,7 +50,7 @@ up 2.0.3 + 2.0.4 transparently. If you've pinned to
 
 The `<3.0` upper bound is unchanged; only breaking changes remain
 those communicated with the 2.0.0 release (per
-https://github.com/mabo-du/heritage-types/releases/tag/v2.0.0),
+https://github.com/dig-tools/heritage-types/releases/tag/v2.0.0),
 notably the `schemaVersion: string \u2192 SchemaVer (REQUIRED)` migration
 that Trowel would have absorbed in the 2.0.0 cycle.
 
@@ -66,9 +66,9 @@ next patch level.
 
 ## Reference
 
-- CHANGELOG: https://github.com/mabo-du/heritage-types/blob/main/CHANGELOG.md
-- v2.0.3 release: https://github.com/mabo-du/heritage-types/releases/tag/v2.0.3
-- v2.0.4 release: https://github.com/mabo-du/heritage-types/releases/tag/v2.0.4
+- CHANGELOG: https://github.com/dig-tools/heritage-types/blob/main/CHANGELOG.md
+- v2.0.3 release: https://github.com/dig-tools/heritage-types/releases/tag/v2.0.3
+- v2.0.4 release: https://github.com/dig-tools/heritage-types/releases/tag/v2.0.4
 
 ## Separate finding: author metadata check
 

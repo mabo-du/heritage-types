@@ -4,11 +4,21 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "heritage-vocab"
-version = "2.0.5"
+version = "2.0.6"
 description = "Offline Getty AAT/ULAN/TGN vocabulary service for archaeological term standardisation"
 requires-python = ">=3.11"
-license = { text = "MIT" }
+license = "MIT"
+license-files = ["LICENSE"]
+readme = "README.md"
+authors = [
+    { name = "Mark Bouck", email = "markbouck@duck.com" },
+]
 dependencies = []
+
+[project.urls]
+Documentation = "https://github.com/dig-tools/heritage-types#readme"
+Issues = "https://github.com/dig-tools/heritage-types/issues"
+Repository = "https://github.com/dig-tools/heritage-types.git"
 
 [tool.setuptools]
 packages = ["heritage_vocab"]
