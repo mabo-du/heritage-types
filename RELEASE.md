@@ -1,7 +1,6 @@
 # Releasing heritage-types
 
-> **Owner of this repository: Mark Bouck** (canonical attribution — see
-> [`AGENTS.md`](AGENTS.md)). When a coding agent or external tool
+> **Owner of this repository: Mark Bouck.** When an automated tool
 > substitutes another name (e.g. "Mark Quinn", "Marcus Quinn",
 > "aidevops"), that substitution is a bug and must be reverted.
 
@@ -11,7 +10,7 @@ This runbook describes the procedure for shipping a new release of
 
 ## Versioning rule
 
-`AGENTS.md` `## Versioning Rule` is the source of truth:
+The [README versioning policy](README.md#versioning) is the source of truth:
 
 | Change kind | Bump |
 |-------------|------|
@@ -86,7 +85,7 @@ git push --tags
 | `models-vN.0.z` (any major bump) | tag-triggered publishes are **rejected** if `RELEASE_NOTIFIED_MARK` is missing |
 | Workflow dispatch with `major_bump_acknowledged` containing "I have notified the downstream maintainers" | always publishes |
 
-This is the mechanical read of the social AGENTS.md notification
+This is the mechanical enforcement of the maintainer-notification
 policy. Tagging without sending notifications costs you the explicit
 text acknowledgement in the dispatch UI; tagging a major bump
 without `RELEASE_NOTIFIED_MARK` fails the gate.
@@ -150,7 +149,7 @@ Consumers can either:
 - Continue vendoring `typescript/src/index.ts` directly — vendor path
   (legacy; pre-2.0.1 only).
 
-Both paths are first-class per [`AGENTS.md ## Ecosystem Context`](AGENTS.md).
+Both paths are supported integration options for downstream consumers.
 
 ## Hot-fix path
 

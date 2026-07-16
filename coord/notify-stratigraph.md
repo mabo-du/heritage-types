@@ -1,8 +1,8 @@
 # Coordination: heritage-types → StratiGraph (2.0.3 + 2.0.4 patches)
 
 > **Status:** OUTBOUND — direct-channel only. The StratiGraph repository is
-> **private** per `AGENTS.md ## Ecosystem Context`, so the only coord
-> channel is direct (email / DM to the StratiGraph maintainer). The
+> **private**, so the only coordination channel is direct (email / DM to
+> the StratiGraph maintainer). The
 > 2.0.0 break cycle was filed as [stratigraph#16](https://github.com/mabo-du/stratigraph/issues/16)
 > when the repo profile was different; for 2.0.3 + 2.0.4 there is no
 > public-issue path.
@@ -16,11 +16,10 @@
 patch-level releases. **No consumer change is required** for
 StratiGraph.
 
-The TypeScript package is now public on npm since v2.0.1 — see
-[`AGENTS.md ## Ecosystem Context`](AGENTS.md). StratiGraph can either
+The TypeScript package is now public on npm since v2.0.1. StratiGraph can either
 continue vendoring `typescript/src/index.ts` (legacy path) or switch
 to `npm install @mabo-du/heritage-types` (current path). Both are
-first-class per AGENTS.md.
+supported integration paths.
 
 ## What changed in `heritage-types` between 2.0.0 and 2.0.4
 
@@ -77,10 +76,10 @@ None required. Optional follow-ups:
 ## Separate finding: author metadata check
 
 If `StratiGraph/package.json` (or any StratiGraph configuration file)
-declares an author other than **Mark Bouck** (the canonical
-attribution per `AGENTS.md ## Naming note for downstream agents`),
+declares an author other than **Mark Bouck** (the canonical project
+attribution),
 the substitution is a bug to revert. The `Mark Bouck` only
-attribution canon was added to AGENTS.md after automated tooling
-hallucinated `Marcus Quinn` across HOARD / Trowel / Libby
+attribution was clarified after automated tooling incorrectly substituted
+`Marcus Quinn` across HOARD / Trowel / Libby
 pyproject.toml files. Fix in a separate follow-up PR. Independent
 of the 2.0.3 + 2.0.4 cycle.

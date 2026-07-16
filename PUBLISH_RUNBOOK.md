@@ -1,9 +1,8 @@
 # heritage-types 2.0.4 — Operator Publish Runbook
 
 > **Ownership & authority.** This runbook is for **Mark Bouck**, who
-> maintains the heritage-types repository. If a coding agent produced
-> this file under a different name, that name is wrong — see
-> [`AGENTS.md`](AGENTS.md) for the canonical attribution.
+> maintains the heritage-types repository. If an automated tool produced
+> this file under a different name, that name is wrong.
 >
 > **What this runbook does.** It assembles the exact command(s) to
 > publish `heritage-models` and `heritage-vocab` to
@@ -55,7 +54,7 @@ operations). See [Roll-back](#roll-back) below.
 ## Gate A — workflow_dispatch (for breaking bumps)
 
 This is the **only way** to publish a strict-major bump (`models-vN.0.0`)
-from `main` without breaking the AGENTS.md gate.
+from `main` without bypassing the release gate.
 The gate step in CI requires the literal acknowledgement string in the
 `major_bump_acknowledged` input — **you type it yourself**, no shortcut.
 
@@ -179,7 +178,7 @@ Drafts of the cross-repo coordination notifications live in
 
 * 2.0.0 breaking (`schemaVersion: string → SchemaVer (REQUIRED)`):
   * `coord/notify-hoard.md.archived-2.0.0` — filed as [HOARD #7](https://github.com/mabo-du/HOARD/issues/7); superseded by HOARD #8
-  * `coord/notify-stratigraph.md.archived-2.0.0` — filed as [StratiGraph #16](https://github.com/mabo-du/stratigraph/issues/16) (StratiGraph source repo is private per `AGENTS.md`; issue tracker is publicly accessible)
+  * `coord/notify-stratigraph.md.archived-2.0.0` — filed as [StratiGraph #16](https://github.com/mabo-du/stratigraph/issues/16) (the source repository is private; its issue tracker is publicly accessible)
   * `coord/notify-trowel.md.archived-2.0.0` — filed as [Trowel #14](https://github.com/mabo-du/trowel/issues/14); superseded by Trowel #15
 
 * 2.0.3 + 2.0.4 non-breaking pipeline-hardening cycle:
@@ -277,4 +276,3 @@ respective `publish-*.yml` workflows.
 
 All four downstream coordination issues filed with version links
 (HOARD #7/#8, StratiGraph #16, Trowel #14/#15).
-
