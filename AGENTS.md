@@ -224,3 +224,7 @@ philosophy).
 ## File deletion safety
 
 Never delete a file from local disk as part of a `.gitignore` / untrack-from-git request. Use `git rm --cached <file>` (untrack only, keep the file on disk) — never plain `rm` or `git rm` without `--cached` — unless deleting the file from disk has been explicitly and separately requested.
+
+## Branches
+
+Default branch: `main`. Every `dig-tools/*` repository (and its gitlab mirror where one exists) uses `main` as the default branch. Open pull requests against `main`.
